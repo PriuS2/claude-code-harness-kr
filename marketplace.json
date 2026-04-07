@@ -1,0 +1,33 @@
+{
+  "name": "claude-code-harness-marketplace",
+  "metadata": {
+    "description": "Claude Code Harness KR - 한국어 번역版"
+  },
+  "owner": {
+    "name": "PriuS2"
+  },
+  "plugins": [
+    {
+      "name": "claude-code-harness-kr",
+      "source": "./",
+      "description": "Claude harness KR - 한국어 번역版 for solo developers",
+      "author": {
+        "name": "PriuS2",
+        "url": "https://github.com/PriuS2"
+      },
+      "homepage": "https://github.com/PriuS2/claude-code-harness-kr",
+      "repository": "https://github.com/PriuS2/claude-code-harness-kr",
+      "license": "MIT",
+      "keywords": [
+        "claude-code",
+        "plugin",
+        "vibecoder",
+        "workflow",
+        "plan-work-review",
+        "korean"
+      ],
+      "category": "productivity",
+      "strict": true
+    }
+  ]
+}

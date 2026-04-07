@@ -3,11 +3,11 @@
   "version": "3.17.2",
   "description": "Claude harness KR - 한국어 번역版 harness for solo developers",
   "author": {
-    "name": "Chachamaru",
-    "url": "https://github.com/Chachamaru127"
+    "name": "PriuS2",
+    "url": "https://github.com/PriuS2"
   },
-  "homepage": "https://github.com/Chachamaru127/claude-code-harness",
-  "repository": "https://github.com/Chachamaru127/claude-code-harness",
+  "homepage": "https://github.com/PriuS2/claude-code-harness-kr",
+  "repository": "https://github.com/PriuS2/claude-code-harness-kr",
   "license": "MIT",
   "keywords": [
     "claude-code",
