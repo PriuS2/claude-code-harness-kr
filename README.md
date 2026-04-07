@@ -8,7 +8,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Chachamaru127/claude-code-harness/releases/latest"><img src="https://img.shields.io/github/v/release/Chachamaru127/claude-code-harness?display_name=tag&sort=semver" alt="Latest Release"></a>
+  🇰🇷 <strong>한국어 번역판</strong> | <a href="https://github.com/Chachamaru127/claude-code-harness">원본 (Original)</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/PriuS2/claude-code-harness-kr/releases/latest"><img src="https://img.shields.io/github/v/release/PriuS2/claude-code-harness-kr?display_name=tag&sort=semver" alt="Latest Release"></a>
   <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License"></a>
   <a href="docs/CLAUDE_CODE_COMPATIBILITY.md"><img src="https://img.shields.io/badge/Claude_Code-v2.1+-purple.svg" alt="Claude Code"></a>
   <img src="https://img.shields.io/badge/Skills-5_Verbs-orange.svg" alt="Skills">
@@ -16,7 +20,7 @@
 </p>
 
 <p align="center">
-  English | <a href="README_ja.md">日本語</a>
+  English | <a href="README_ja.md">日本語</a> | <a href="README_ko.md">🇰🇷 한국어</a>
 </p>
 
 ---
@@ -57,15 +61,17 @@ Supported baseline and latest verified snapshot: see [Claude Code Compatibility]
 
 ---
 
-## Install in 30 Seconds
+## Install in 30 Seconds (한국어 번역판)
+
+> ⚠️ **이 플러그인은 [원본](https://github.com/Chachamaru127/claude-code-harness)의 한국어 번역판입니다.**
 
 ```bash
 # Start Claude Code in your project
 claude
 
 # Add the marketplace & install
-/plugin marketplace add Chachamaru127/claude-code-harness
-/plugin install claude-code-harness@claude-code-harness-marketplace
+/plugin marketplace add PriuS2/claude-code-harness-kr
+/plugin install claude-code-harness-kr@claude-code-harness-marketplace
 
 # Initialize your project
 /harness-setup
@@ -299,9 +305,9 @@ Use Harness with [Codex CLI](https://github.com/openai/codex) — no Claude Code
 **Prerequisites**: [Codex CLI](https://github.com/openai/codex) (`npm i -g @openai/codex`), OpenAI API key (`OPENAI_API_KEY`), Git.
 
 ```bash
-# 1. Clone the Harness repository
-git clone https://github.com/Chachamaru127/claude-code-harness.git
-cd claude-code-harness
+# 1. Clone the Harness repository (한국어 번역판)
+git clone https://github.com/PriuS2/claude-code-harness-kr.git
+cd claude-code-harness-kr
 
 # 2. Install skills/rules to user scope (~/.codex)
 ./scripts/setup-codex.sh --user
@@ -420,14 +426,14 @@ Skill packs can teach a prompt. Harness also enforces behavior at runtime.
 | Plugin not loading | Clear cache: `rm -rf ~/.claude/plugins/cache/claude-code-harness-marketplace/` and restart |
 | Hooks not working | Ensure Node.js 18+ is installed |
 
-For more help, [open an issue](https://github.com/Chachamaru127/claude-code-harness/issues).
+For more help, [open an issue](https://github.com/PriuS2/claude-code-harness-kr/issues).
 
 ---
 
 ## Uninstall
 
 ```bash
-/plugin uninstall claude-code-harness
+/plugin uninstall claude-code-harness-kr
 ```
 
 Project files (Plans.md, SSOT files) remain unchanged.
