@@ -1,22 +1,22 @@
-# Utility Functions
+# Utility Functions - 유틸리티 함수
 
-Conversion utilities for working with Remotion time units.
+Remotion 시간 단위로 작업하기 위한 변환 유틸리티.
 
-## Overview
+## 개요
 
-Remotion uses **frames** as the primary time unit, while JSON schemas use **milliseconds**. These utilities provide bidirectional conversion between time units.
+Remotion은 **프레임**을 기본 시간 단위로 사용하고, JSON 스키마는 **밀리초**를 사용합니다. 이러한 유틸리티는 시간 단위 간 양방향 변환을 제공합니다.
 
-## Files
+## 파일
 
-- **`converters.ts`** - TypeScript version (for Remotion components)
-- **`converters.js`** - JavaScript version (for Node.js scripts and tests)
-- **`index.ts`** - Barrel export
+- **`converters.ts`** - TypeScript 버전 (Remotion 컴포넌트용)
+- **`converters.js`** - JavaScript 버전 (Node.js 스크립트 및 테스트용)
+- **`index.ts`** - 배럴 export
 
-## Core Conversions
+## 핵심 변환
 
 ### msToFrames(ms, fps)
 
-Converts milliseconds to frames.
+밀리초를 프레임으로 변환합니다.
 
 ```javascript
 msToFrames(1000, 30)  // => 30 (1 second at 30fps)
@@ -25,18 +25,18 @@ msToFrames(33.33, 30) // => 1 (approximately 1 frame)
 ```
 
 **Parameters**:
-- `ms` (number) - Duration in milliseconds
-- `fps` (number, optional) - Frames per second (default: 30)
+- `ms` (number) - 밀리초 단위 지속 시간
+- `fps` (number, optional) - 초당 프레임 (기본값: 30)
 
-**Returns**: Duration in frames (rounded to nearest integer)
+**Returns**: 프레임 단위 지속 시간 (가장 가까운 정수로 반올림)
 
-**Throws**: Error if ms < 0 or fps <= 0
+**Throws**: ms < 0 또는 fps <= 0인 경우 에러
 
 ---
 
 ### framesToMs(frames, fps)
 
-Converts frames to milliseconds.
+프레임을 밀리초로 변환합니다.
 
 ```javascript
 framesToMs(30, 30) // => 1000 (30 frames at 30fps = 1 second)
@@ -45,18 +45,18 @@ framesToMs(1, 30)  // => 33.33
 ```
 
 **Parameters**:
-- `frames` (number) - Duration in frames
-- `fps` (number, optional) - Frames per second (default: 30)
+- `frames` (number) - 프레임 단위 지속 시간
+- `fps` (number, optional) - 초당 프레임 (기본값: 30)
 
-**Returns**: Duration in milliseconds (rounded to 2 decimal places)
+**Returns**: 밀리초 단위 지속 시간 (소수점 2자리까지 반올림)
 
-**Throws**: Error if frames < 0 or fps <= 0
+**Throws**: frames < 0 또는 fps <= 0인 경우 에러
 
 ---
 
 ### secondsToFrames(seconds, fps)
 
-Converts seconds to frames.
+초를 프레임으로 변환합니다.
 
 ```javascript
 secondsToFrames(1, 30)    // => 30
@@ -67,7 +67,7 @@ secondsToFrames(0.5, 60)  // => 30
 
 ### framesToSeconds(frames, fps)
 
-Converts frames to seconds.
+프레임을 초로 변환합니다.
 
 ```javascript
 framesToSeconds(30, 30) // => 1.00
@@ -78,7 +78,7 @@ framesToSeconds(15, 30) // => 0.50
 
 ### msToSeconds(ms)
 
-Converts milliseconds to seconds.
+밀리초를 초로 변환합니다.
 
 ```javascript
 msToSeconds(1000) // => 1.00
@@ -89,7 +89,7 @@ msToSeconds(500)  // => 0.50
 
 ### secondsToMs(seconds)
 
-Converts seconds to milliseconds.
+초를 밀리초로 변환합니다.
 
 ```javascript
 secondsToMs(1)   // => 1000
@@ -98,11 +98,11 @@ secondsToMs(0.5) // => 500
 
 ---
 
-## Batch Conversions
+## 배치 변환
 
 ### batchMsToFrames(msValues, fps)
 
-Convert multiple millisecond values to frames.
+여러 밀리초 값을 프레임으로 변환합니다.
 
 ```javascript
 batchMsToFrames([1000, 2000, 3000], 30)
@@ -113,7 +113,7 @@ batchMsToFrames([1000, 2000, 3000], 30)
 
 ### batchFramesToMs(frameValues, fps)
 
-Convert multiple frame values to milliseconds.
+여러 프레임 값을 밀리초로 변환합니다.
 
 ```javascript
 batchFramesToMs([30, 60, 90], 30)
@@ -122,11 +122,11 @@ batchFramesToMs([30, 60, 90], 30)
 
 ---
 
-## Timestamp Utilities
+## 타임스탬프 유틸리티
 
 ### getFrameAtTimestamp(timestampMs, fps)
 
-Calculate frame number at a specific timestamp.
+특정 타임스탬프에서 프레임 번호를 계산합니다.
 
 ```javascript
 getFrameAtTimestamp(1500, 30) // => 45
@@ -136,7 +136,7 @@ getFrameAtTimestamp(1500, 30) // => 45
 
 ### getTimestampAtFrame(frameNumber, fps)
 
-Calculate timestamp at a specific frame.
+특정 프레임에서 타임스탬프를 계산합니다.
 
 ```javascript
 getTimestampAtFrame(45, 30) // => 1500
@@ -144,11 +144,11 @@ getTimestampAtFrame(45, 30) // => 1500
 
 ---
 
-## Validation
+## 검증
 
 ### isValidFps(fps)
 
-Validate FPS value.
+FPS 값을 검증합니다.
 
 ```javascript
 isValidFps(30)       // => true
@@ -159,11 +159,11 @@ isValidFps(Infinity) // => false
 
 ---
 
-## Constants
+## 상수
 
 ### DEFAULT_FPS
 
-Default frames per second (30).
+기본 초당 프레임 (30).
 
 ```javascript
 const { DEFAULT_FPS } = require('./converters');
@@ -174,7 +174,7 @@ console.log(DEFAULT_FPS); // => 30
 
 ### FPS_PRESETS
 
-Common FPS presets.
+일반 FPS 프리셋.
 
 ```javascript
 const { FPS_PRESETS } = require('./converters');
@@ -187,9 +187,9 @@ FPS_PRESETS.SMOOTH   // => 120 (very smooth)
 
 ---
 
-## Usage Examples
+## 사용 예
 
-### Example 1: Converting Schema Duration to Remotion Frames
+### Example 1: 스키마 Duration을 Remotion 프레임으로 변환
 
 ```typescript
 import { msToFrames } from '../src/utils/converters';
@@ -203,7 +203,7 @@ export const MyScene: React.FC<{ durationMs: number }> = ({ durationMs }) => {
 };
 ```
 
-### Example 2: Batch Converting Animation Timings
+### Example 2: 애니메이션 타이밍 일괄 변환
 
 ```javascript
 const { batchMsToFrames } = require('./src/utils/converters');
@@ -224,7 +224,7 @@ console.log({ introFrames, mainFrames, outroFrames });
 // => { introFrames: 30, mainFrames: 90, outroFrames: 30 }
 ```
 
-### Example 3: Working with Different FPS
+### Example 3: 다양한 FPS로 작업
 
 ```javascript
 const { msToFrames, FPS_PRESETS } = require('./src/utils/converters');
@@ -239,7 +239,7 @@ const standard = msToFrames(1000, FPS_PRESETS.STANDARD); // => 30
 const hd = msToFrames(1000, FPS_PRESETS.HD); // => 60
 ```
 
-### Example 4: Round-Trip Conversion
+### Example 4: 라운드트립 변환
 
 ```javascript
 const { msToFrames, framesToMs } = require('./src/utils/converters');
@@ -253,9 +253,9 @@ console.log(originalMs === backToMs); // => true
 
 ---
 
-## Error Handling
+## 에러 처리
 
-All conversion functions validate inputs and throw descriptive errors:
+모든 변환 함수는 입력을 검증하고 설명적인 에러를 throw합니다:
 
 ```javascript
 msToFrames(-100, 30)
@@ -270,39 +270,39 @@ secondsToFrames(-1, 30)
 
 ---
 
-## Testing
+## 테스트
 
-Run tests to verify all conversions:
+모든 변환을 검증하기 위해 테스트를 실행합니다:
 
 ```bash
 npm test -- tests/converters.test.js
 ```
 
-Test coverage includes:
-- ✅ Basic conversions
-- ✅ Default parameters
-- ✅ Batch operations
-- ✅ Edge cases (zero, very small, very large values)
-- ✅ Error handling
-- ✅ Round-trip conversions
-- ✅ Different FPS values
+테스트 커버리지:
+- ✅ 기본 변환
+- ✅ 기본 파라미터
+- ✅ 배치 연산
+- ✅ 엣지 케이스 (0, 매우 작은 값, 매우 큰 값)
+- ✅ 에러 처리
+- ✅ 라운드트립 변환
+- ✅ 다양한 FPS 값
 
 ---
 
-## Performance
+## 성능
 
-All conversion functions are lightweight and optimized for performance:
+모든 변환 함수는 성능에 최적화된 경량입니다:
 
-- **Arithmetic operations only** (no heavy computations)
-- **Rounding to 2 decimal places** for precision
-- **No external dependencies**
+- **산술 연산만** (과도한 계산 없음)
+- **정밀도를 위한 소수점 2자리까지 반올림**
+- **외부 의존성 없음**
 
-Suitable for use in Remotion's rendering loop without performance concerns.
+Remotion의 렌더링 루프에서 사용해도 성능 문제 없이 적합합니다.
 
 ---
 
-## Related Files
+## 관련 파일
 
-- **Type Definitions**: `src/types/components.ts` - Component type definitions
-- **Tests**: `tests/converters.test.js` - Comprehensive test suite
-- **Remotion Components**: `remotion/components/*.tsx` - Components using these utilities
+- **타입 정의**: `src/types/components.ts` - 컴포넌트 타입 정의
+- **테스트**: `tests/converters.test.js` - 포괄적 테스트 스위트
+- **Remotion 컴포넌트**: `remotion/components/*.tsx` - 이러한 유틸리티를 사용하는 컴포넌트

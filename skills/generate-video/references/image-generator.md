@@ -4,45 +4,45 @@ Nano Banana Pro（Google DeepMind）を使用して、動画シーン用の高�
 
 ---
 
-## 概要
+## 개요
 
-`/generate-video` のシーン生成フェーズで、素材画像が必要と判定された場合に自動実行されます。
+`/generate-video` 의 씬 生成 페이즈에서、素材画像が必要と判定された場合に自動実行されます。
 2枚生成 → Claude が品質判定 → NG なら再生成、という品質保証ループを実装しています。
 
-## 前提条件
+## 사전 조건
 
-- `GOOGLE_AI_API_KEY` 環境変数が設定済み
-- Google AI Studio で Nano Banana Pro（Gemini 3 Pro Image Preview）が有効化済み
+- `GOOGLE_AI_API_KEY` 환경 변수가 설정됨
+- Google AI Studio で Nano Banana Pro（Gemini 3 Pro Image Preview）가有効化됨
 
 ---
 
 ## API 仕様
 
-> **公式ドキュメント**: [Nano Banana image generation | Gemini API](https://ai.google.dev/gemini-api/docs/image-generation)
+> **공식 문서**: [Nano Banana image generation | Gemini API](https://ai.google.dev/gemini-api/docs/image-generation)
 
-### エンドポイント
+### 엔드포인트
 
 ```
 POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent
 ```
 
-### モデル選択
+### 모델 선택
 
-| モデル | 用途 | 最大解像度 |
+| 모델 | 용도 | 최대 해상도 |
 |--------|------|-----------|
-| `gemini-3-pro-image-preview` | プロ品質（推奨） | 4K |
-| `gemini-2.5-flash-image` | 高速・低コスト | 1024px |
+| `gemini-3-pro-image-preview` | 프로品质（권장） | 4K |
+| `gemini-2.5-flash-image` |高速·저렴| 1024px |
 
-### 認証
+### 인증
 
 ```bash
 # x-goog-api-key ヘッダー（Gemini API 標準方式）
 x-goog-api-key: ${GOOGLE_AI_API_KEY}
 ```
 
-> **注意**: Gemini API は `x-goog-api-key` ヘッダーを使用します。Query parameter 方式 (`?key=...`) も利用可能ですが、ヘッダー方式を推奨します。
+> **주의**: Gemini API は `x-goog-api-key` ヘッダーを使用します。Query parameter 方式 (`?key=...`) 도利用可能하지만、ヘッダー方式을 권장합니다。
 
-### リクエスト形式
+### 요청 형식
 
 ```json
 {
@@ -63,7 +63,7 @@ x-goog-api-key: ${GOOGLE_AI_API_KEY}
 
 > **注**: `responseModalities` で `["TEXT", "IMAGE"]` または `["IMAGE"]` を指定できます。本フローでは品質判定用にテキスト説明も取得するため、両方を指定しています。
 
-### レスポンス形式
+### 응답 형식
 
 ```json
 {
@@ -87,36 +87,36 @@ x-goog-api-key: ${GOOGLE_AI_API_KEY}
 
 ---
 
-## 解像度オプション
+## 해상도 옵션
 
-| 設定 | 解像度 | 用途 | コスト目安 |
+| 설정 | 해상도 | 용도 | 비용目安 |
 |------|--------|------|-----------|
-| `1K` | 1024×1024 | プレビュー、テスト | ~$0.02/枚 |
-| `2K` | 2048×2048 | 標準品質 | ~$0.06/枚 |
-| `4K` | 4096×4096 | 高品質、プロフェッショナル | ~$0.12/枚 |
+| `1K` | 1024×1024 | 프리뷰, 테스트 | ~$0.02/枚 |
+| `2K` | 2048×2048 | 표준 품질 | ~$0.06/枚 |
+| `4K` | 4096×4096 | 고품질, 프로페셔널 | ~$0.12/枚 |
 
-### アスペクト比
+###アスペクト比
 
-| 比率 | 用途 |
+| 비율 | 용도 |
 |------|------|
-| `16:9` | 動画シーン（推奨） |
-| `1:1` | アイコン、ロゴ |
-| `9:16` | 縦型動画 |
-| `4:3` | プレゼン資料 |
+| `16:9` | 영상 씬（권장） |
+| `1:1` | 아이콘, 로고 |
+| `9:16` | 세로형 영상 |
+| `4:3` | 프레젠테이션 자료 |
 
 ---
 
-## プロンプト設計ガイドライン
+## プロンプト設計 가이드라인
 
-### 基本構造
+### 基本 구조
 
 ```
 [主題] + [スタイル] + [品質指定] + [制約]
 ```
 
-### シーンタイプ別プロンプトテンプレート
+### 씬 타입별 プロンプト テンプレート
 
-#### イントロ/タイトルシーン
+#### 인트로/타이틀 씬
 
 ```
 Professional product logo and title card for "{product_name}",
@@ -125,7 +125,7 @@ modern minimalist design, clean typography,
 cinematic quality, 4K render
 ```
 
-#### UI デモシーン（補助画像）
+#### UI デモ 씬（보조 이미지）
 
 ```
 Modern web application interface showing {feature_description},
@@ -134,7 +134,7 @@ professional SaaS aesthetic, mockup style,
 no text labels, focus on visual hierarchy
 ```
 
-#### CTA シーン
+#### CTA 씬
 
 ```
 Call-to-action banner for {product_name},
@@ -143,7 +143,7 @@ action-oriented design, prominent button,
 clear visual hierarchy, engaging composition
 ```
 
-#### アーキテクチャ/概念図
+#### 아키텍처/개념도
 
 ```
 Technical architecture diagram showing {concept},
@@ -154,39 +154,39 @@ professional documentation quality, clean lines
 
 ### プロンプト品質向上のコツ
 
-| 追加要素 | 効果 |
+| 추가 요소 | 효과 |
 |---------|------|
-| `professional quality` | 全体の品質向上 |
-| `clean design` | 不要な要素の削減 |
-| `modern aesthetic` | 現代的なデザイン |
-| `cinematic lighting` | ドラマチックな照明 |
-| `4K render` | 高解像度 |
-| `no text` | テキストなし（後で追加する場合） |
+| `professional quality` | 전체的品质向上 |
+| `clean design` | 불필요한 요소 감소 |
+| `modern aesthetic` | 현대적 디자인 |
+| `cinematic lighting` | 드라마틱한 조명 |
+| `4K render` | 고해상도 |
+| `no text` | 텍스트 없음（後で追加する場合）|
 
-### 避けるべきプロンプト
+### 피해야 할 プロンプト
 
-| NG パターン | 理由 |
+| NG 패턴 | 이유 |
 |------------|------|
-| 曖昧な指示 | 「いい感じの画像」→ 結果が不安定 |
-| 過度に複雑 | 要素が多すぎると品質低下 |
-| テキスト指定 | AI 生成テキストは品質不安定 |
-| 著作権物 | ブランドロゴ等は生成不可 |
+| 모호한 지시 | 「いい感じの画像」→ 結果 불안정 |
+| 과도하게 복잡 | 요소가 많으면品質低下 |
+| 텍스트 지정 | AI 生成テキストは品質不安定 |
+| 저작권물 | ブランドロゴ等は生成不可 |
 
 ---
 
-## 実行フロー
+##実行 플로우
 
 ```
-シーン生成フェーズ
+씬 生成 페이즈
     │
     ├── [Step 1] 素材必要判定
-    │   └─ シーンタイプ、既存素材の有無を確認
+    │   └─ 씬 타입,既存素材の有無を確認
     │       ├── 素材あり → スキップ
     │       └── 素材なし → Step 2 へ
     │
     ├── [Step 2] プロンプト生成
-    │   ├─ シーン情報からプロンプト構築
-    │   ├─ ブランド情報（色、スタイル）を反映
+    │   ├─ 씬 정보からプロンプト構築
+    │   ├─  브랜드情報（색, 스타일）を反映
     │   └─ テンプレートを適用
     │
     ├── [Step 3] 画像生成（2枚並列）
@@ -197,7 +197,7 @@ professional documentation quality, clean lines
     │   └─ → image-quality-check.md 参照
     │
     ├── [Step 5] 結果処理
-    │   ├── 成功 → 画像保存、シーンに組み込み
+    │   ├── 成功 → 画像保存、씬에組み込み
     │   └── 失敗 → Step 6 へ
     │
     └── [Step 6] 再生成ループ（最大3回）
@@ -209,7 +209,7 @@ professional documentation quality, clean lines
 
 ## Bash 実行例
 
-### curl での API 呼び出し
+### curl 로의 API 호출
 
 ```bash
 # 環境変数確認（キーが設定されているか確認）
@@ -240,9 +240,9 @@ curl -X POST \
 cat response.json | jq -r '.candidates[0].content.parts[] | select(.inline_data) | .inline_data.data' | head -1 | base64 -d > out/assets/generated/image_1.png
 ```
 
-> **注意**: 1回のリクエストで1枚の画像が生成されます。2枚必要な場合は2回リクエストを実行してください。
+> **주의**: 1회의リクエストで1枚の画像が生成されます。2枚必要な場合は2回リクエストを実行してください。
 
-### 画像保存先
+###画像 保存先
 
 ```
 out/
@@ -266,15 +266,15 @@ max_attempts = 3
 
 ### 再生成時のプロンプト改善
 
-各試行で Claude がプロンプトを改善:
+각 시도마다 Claude がプロンプトを改善:
 
-| 試行 | 改善戦略 |
+| 시도 | 개선 전략 |
 |------|---------|
-| 1回目 | 初期プロンプトで生成 |
-| 2回目 | 品質指摘を反映してプロンプト調整 |
-| 3回目 | より具体的な指示を追加、スタイル変更 |
+| 1회 |初期プロンプトで生成|
+| 2회 |品質指摘を反映してプロンプト調整|
+| 3회 |より具体的な指示を追加、スタイル変更|
 
-### 改善プロンプト生成
+###改善 プロンプト生成
 
 ```
 前回の画像が以下の理由で不採用でした:
@@ -293,13 +293,13 @@ max_attempts = 3
 ```
 ⚠️ 画像生成が3回失敗しました
 
-シーン: {scene_name}
+씬: {scene_name}
 最後のエラー: {last_error}
 
-選択肢:
+선택지:
 1. 「続行」→ プレースホルダー画像で進める
 2. 「スキップ」→ このシーンを画像なしで生成
-3. 「手動」→ ユーザーが画像を提供
+3. 「手動」→  使用자가 이미지를 제공
 ```
 
 ---
@@ -308,12 +308,12 @@ max_attempts = 3
 
 ### API エラー
 
-| エラーコード | 原因 | 対処 |
+| 에러 코드 | 원인 | 대응 |
 |-------------|------|------|
 | `400` | 不正なプロンプト | プロンプト内容を確認 |
-| `401` | 認証失敗 | API キーを確認 |
-| `429` | レート制限 | 60秒待機して再試行 |
-| `500` | サーバーエラー | 30秒待機して再試行 |
+| `401` | 認証失敗 | API 키를 확인 |
+| `429` | レート制限 | 60초 대기して再試行 |
+| `500` | 서버 에러 | 30초 대기して再試行 |
 
 ### コンテンツポリシー違反
 
@@ -347,25 +347,25 @@ max_attempts = 3
 
 ## コスト見積もり
 
-### シーンあたりのコスト
+### 씬당 비용
 
 ```
 基本: 2枚 × $0.12 = $0.24
 最大（3回再生成）: 6枚 × $0.12 = $0.72
 ```
 
-### 動画あたりのコスト目安
+### 영상당 비용目安
 
-| 動画タイプ | シーン数 | 画像生成シーン | コスト目安 |
+| 영상 타입 | 씬 수 | 画像生成 씬 | 비용目安 |
 |-----------|---------|---------------|-----------|
-| 90秒ティザー | 5 | 2-3 | $0.48-$0.72 |
-| 3分デモ | 8 | 3-4 | $0.72-$0.96 |
-| 5分アーキテクチャ | 12 | 4-6 | $0.96-$1.44 |
+| 90초 티저 | 5 | 2-3 | $0.48-$0.72 |
+| 3분 데모 | 8 | 3-4 | $0.72-$0.96 |
+| 5분 아키텍처 | 12 | 4-6 | $0.96-$1.44 |
 
 ---
 
-## 関連ドキュメント
+##関連 문서
 
-- [image-quality-check.md](./image-quality-check.md) - 品質判定ロジック
-- [generator.md](./generator.md) - 並列シーン生成エンジン
-- [planner.md](./planner.md) - シナリオプランナー
+- [image-quality-check.md](./image-quality-check.md) - 品質判定 로직
+- [generator.md](./generator.md) - 並列 씬 生成 엔진
+- [planner.md](./planner.md) - 시나리오 플래너

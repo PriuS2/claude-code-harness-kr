@@ -1,8 +1,7 @@
 ---
 name: principles
 description: "開発原則、ガイドライン、VibeCoder向けガイダンスを提供。Use when user mentions principles, guidelines, safety, or diff-aware editing. Do not use for actual implementation—use the impl skill instead."
-description-en: "Provides development principles, guidelines, and VibeCoder guidance. Use when user mentions principles, guidelines, safety, or diff-aware editing. Do not use for actual implementation—use the impl skill instead."
-description-ja: "開発原則、ガイドライン、VibeCoder向けガイダンスを提供。Use when user mentions principles, guidelines, safety, or diff-aware editing. Do not use for actual implementation—use the impl skill instead."
+description-ja: "開発原則、ガイドライン、VibeCoder向けガイダンスを提供。ユーザーが原则、ガイドライン、安全、差分編集について言及した場合に使用。実際の実装には使用しない—inplementationにはimplスキルを使用。"
 allowed-tools: ["Read"]
 user-invocable: false
 ---

@@ -1,6 +1,7 @@
 ---
 name: session-control
 description: "Apply /work --resume/--fork flags by updating session state files."
+description-ja: "/work --resume/--forkフラグを適用し、セッション状態ファイルを更新する。"
 allowed-tools: ["Read", "Bash", "Write", "Edit"]
 ---
 

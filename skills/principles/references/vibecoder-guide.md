@@ -1,6 +1,7 @@
 ---
 name: vibecoder-guide
 description: "VibeCoder（非技術者）が自然言語で開発を進められるようガイドするスキル。非技術者向けのガイダンスを提供する場合に使用します。"
+description-ja: "VibeCoder（非技術者）が自然言語で開発を進められるようガイドするスキル。非技術者向けのガイダンスを提供する場合に使用。"
 allowed-tools: ["Read"]
 ---
 

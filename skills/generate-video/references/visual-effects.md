@@ -1,21 +1,21 @@
-# Visual Effects Library
+# Visual Effects Library - 시각 효과 라이브러리
 
-動画にインパクトを与える視覚効果のテンプレート集です。
+영상 에 임팩트를与える視覚効果のテンプレート集です。
 
 ---
 
-## カラーパレット
+## 컬러 팔레트
 
-### Cyberpunk / Neon（推奨）
+### Cyberpunk / Neon（권장）
 
-インパクトのある技術系動画向け。
+임팩트 있는 테크系 영상向け。
 
 ```tsx
 const colors = {
-  background: "#0A0A0F",  // ディープダーク
-  primary: "#00F5FF",     // シアン
-  secondary: "#FF00FF",   // マゼンタ
-  accent: "#7B2FFF",      // パープル
+  background: "#0A0A0F",  // 딥 다크
+  primary: "#00F5FF",     // 시안
+  secondary: "#FF00FF",   // 마젠타
+  accent: "#7B2FFF",      // 퍼플
   text: "#FFFFFF",
   glow: "rgba(0, 245, 255, 0.5)",
 };
@@ -23,25 +23,25 @@ const colors = {
 
 ### Corporate / Professional
 
-ビジネス向け落ち着いたトーン。
+비즈니스向け落ち着いたトーン。
 
 ```tsx
 const colors = {
   background: "#FFFFFF",
-  primary: "#FF6B35",     // オレンジ
-  secondary: "#004E89",   // ネイビー
-  accent: "#2EC4B6",      // ティール
+  primary: "#FF6B35",     // 오렌지
+  secondary: "#004E89",   // 네이비
+  accent: "#2EC4B6",      // 티얼
   text: "#1A1A2E",
 };
 ```
 
 ---
 
-## 効果コンポーネント
+## 효과 컴포넌트
 
-### GlitchText - グリッチテキスト
+### GlitchText - 글리치 텍스트
 
-RGB分離 + ランダムオフセットでサイバーパンク風テキスト。
+RGB 분리 + 랜덤 오프셋으로 사이버펑크풍 텍스트.
 
 ```tsx
 import { useCurrentFrame, interpolate, random } from "remotion";
@@ -72,7 +72,7 @@ const GlitchText: React.FC<{
 
   return (
     <div style={{ position: "relative", opacity }}>
-      {/* Red channel (マゼンタ) */}
+      {/* Red channel (마젠타) */}
       <div
         style={{
           position: "absolute",
@@ -86,7 +86,7 @@ const GlitchText: React.FC<{
       >
         {text}
       </div>
-      {/* Blue channel (シアン) */}
+      {/* Blue channel (시안) */}
       <div
         style={{
           position: "absolute",
@@ -117,16 +117,16 @@ const GlitchText: React.FC<{
 };
 ```
 
-**使用例**:
+**사용 예**:
 ```tsx
-<GlitchText text="革新的な機能" fontSize={64} startFrame={0} />
+<GlitchText text="혁신적인 기능" fontSize={64} startFrame={0} />
 ```
 
 ---
 
-### Particles - パーティクルシステム
+### Particles - 파티클 시스템
 
-浮遊・収束するパーティクルアニメーション。
+부유·수렴하는 파티클 애니메이션.
 
 ```tsx
 import { useMemo } from "react";
@@ -134,8 +134,8 @@ import { useCurrentFrame, useVideoConfig, interpolate, random } from "remotion";
 
 const Particles: React.FC<{
   count?: number;
-  converge?: boolean;      // 中央に収束するか
-  convergeFrame?: number;  // 収束完了フレーム
+  converge?: boolean;      // 중앙에 수렴하는지
+  convergeFrame?: number;  // 수렴 완료 프레임
 }> = ({ count = 50, converge = false, convergeFrame = 100 }) => {
   const frame = useCurrentFrame();
   const { width, height } = useVideoConfig();
@@ -198,20 +198,20 @@ const Particles: React.FC<{
 };
 ```
 
-**使用例**:
+**사용 예**:
 ```tsx
-{/* 浮遊パーティクル */}
+{/* 부유 파티클 */}
 <Particles count={80} />
 
-{/* 収束パーティクル（CTAシーン向け） */}
+{/* 수렴 파티클（CTA 씬용）*/}
 <Particles count={100} converge convergeFrame={150} />
 ```
 
 ---
 
-### ScanLine - スキャンライン
+### ScanLine - 스캔라인
 
-画面を走る解析波エフェクト。
+화면을 지나는解析波エフェクト。
 
 ```tsx
 const ScanLine: React.FC<{ speed?: number }> = ({ speed = 1 }) => {
@@ -235,7 +235,7 @@ const ScanLine: React.FC<{ speed?: number }> = ({ speed = 1 }) => {
 };
 ```
 
-**使用例**:
+**사용 예**:
 ```tsx
 {/* 解析中の演出 */}
 {frame < 60 && <ScanLine speed={3} />}
@@ -243,9 +243,9 @@ const ScanLine: React.FC<{ speed?: number }> = ({ speed = 1 }) => {
 
 ---
 
-### ProgressBar - 進行バー
+### ProgressBar - 진행 바
 
-並列処理の進行状況を可視化。
+병렬 처리의 진행 상황을 시각화.
 
 ```tsx
 const ProgressBar: React.FC<{ progress: number; label: string }> = ({
@@ -287,7 +287,7 @@ const ProgressBar: React.FC<{ progress: number; label: string }> = ({
 };
 ```
 
-**使用例**:
+**사용 예**:
 ```tsx
 const agents = [
   { name: "Agent 1: Intro", progress: Math.min(1, frame / 150) },
@@ -302,9 +302,9 @@ const agents = [
 
 ---
 
-### 3D Parallax - パララックス効果
+### 3D Parallax - 패럴랙스 효과
 
-奥行きのある3Dカード表示。
+깊이感のある 3D 카드 표시.
 
 ```tsx
 const ParallaxCard: React.FC<{
@@ -349,20 +349,20 @@ const ParallaxCard: React.FC<{
 };
 ```
 
-**使用例**:
+**사용 예**:
 ```tsx
 <div style={{ display: "flex", gap: 40, perspective: 1000 }}>
-  <ParallaxCard delay={30} color="#00F5FF">LP/広告</ParallaxCard>
-  <ParallaxCard delay={70} color="#FF00FF">Introデモ</ParallaxCard>
-  <ParallaxCard delay={110} color="#7B2FFF">リリースノート</ParallaxCard>
+  <ParallaxCard delay={30} color="#00F5FF">LP/광고</ParallaxCard>
+  <ParallaxCard delay={70} color="#FF00FF">Intro 데모</ParallaxCard>
+  <ParallaxCard delay={110} color="#7B2FFF">릴리스 노트</ParallaxCard>
 </div>
 ```
 
 ---
 
-## 組み合わせ例
+## 조합 예시
 
-### インパクト重視のHookシーン
+### 임팩트 중시 Hook 씬
 
 ```tsx
 const HookScene: React.FC = () => {
@@ -381,9 +381,9 @@ const HookScene: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <GlitchText text="コードから動画が" fontSize={64} startFrame={0} />
+        <GlitchText text="코드에서 영상으로" fontSize={64} startFrame={0} />
         <div style={{ height: 20 }} />
-        <GlitchText text="自動生成される時代へ" fontSize={64} startFrame={15} />
+        <GlitchText text="자동 생성되는 시대へ" fontSize={64} startFrame={15} />
       </div>
       {frame < 30 && <ScanLine speed={3} />}
     </AbsoluteFill>
@@ -391,7 +391,7 @@ const HookScene: React.FC = () => {
 };
 ```
 
-### CTAシーン（パーティクル収束）
+### CTA 씬（파티클 수렴）
 
 ```tsx
 const CTAScene: React.FC = () => {
@@ -437,7 +437,7 @@ const CTAScene: React.FC = () => {
             boxShadow: "0 0 40px rgba(0, 245, 255, 0.6)",
           }}
         >
-          今すぐ試す
+          지금 바로 시도
         </div>
       </div>
     </AbsoluteFill>
@@ -447,9 +447,9 @@ const CTAScene: React.FC = () => {
 
 ---
 
-## 注意事項
+## 주의 사항
 
-| 項目 | ルール |
+| 항목 | 규칙 |
 |------|--------|
 | `random()` | 引数でシード指定必須（フレーム毎に同じ値） |
 | `useMemo` | パーティクル等の大量オブジェクトは必ずメモ化 |
@@ -461,5 +461,5 @@ const CTAScene: React.FC = () => {
 
 ## References
 
-- [generator.md](generator.md) - 並列生成エンジン
-- [best-practices.md](best-practices.md) - 動画制作ベストプラクティス
+- [generator.md](generator.md) - 並列 생성 엔진
+- [best-practices.md](best-practices.md) - 영상 제작 베스트 프랙티스

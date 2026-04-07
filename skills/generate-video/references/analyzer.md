@@ -1,27 +1,27 @@
-# Video Analyzer - コードベース分析エンジン
+# Video Analyzer - 코드베이스 분석 엔진
 
-プロジェクトを自動分析し、動画生成に必要な情報を抽出します。
+프로젝트를 자동 분석하고 영상 생성에 필요한 정보를 추출합니다.
 
 ---
 
-## 概要
+## 개요
 
-`/generate-video` の Step 1 で実行される分析エンジンです。
-コードベースとプロジェクト資産を解析し、最適な動画構成を判定します。
+`/generate-video` 의 Step 1에서 실행되는 분석 엔진입니다.
+코드베이스와 프로젝트 자산을 분석하여 최적의 영상 구성을 판정합니다.
 
-## 分析項目
+## 분석 항목
 
-### 1. フレームワーク検出
+### 1. 프레임워크 감지
 
-| 検出対象 | 判定方法 |
+| 감지 대상 | 판정 방법 |
 |---------|---------|
 | Next.js | `next.config.*` の存在 |
-| React | `package.json` の dependencies |
-| Vue | `vue.config.*` または `nuxt.config.*` |
+| React | `package.json` 의 dependencies |
+| Vue | `vue.config.*` 또는 `nuxt.config.*` |
 | Svelte | `svelte.config.*` |
-| Express/Fastify | `package.json` の dependencies |
+| Express/Fastify | `package.json` 의 dependencies |
 
-**実行コマンド**:
+**실행 명령**:
 ```bash
 # package.json から依存関係を抽出
 cat package.json | jq '.dependencies, .devDependencies'
@@ -30,55 +30,55 @@ cat package.json | jq '.dependencies, .devDependencies'
 ls -la *.config.* 2>/dev/null
 ```
 
-### 2. 主要機能検出
+### 2. 주요 기능 감지
 
-| 機能 | 検出パターン |
+| 기능 | 감지 패턴 |
 |------|-------------|
-| 認証 | `auth/`, `login/`, `@clerk`, `@auth0`, `supabase` |
-| 決済 | `payment/`, `billing/`, `stripe`, `@stripe` |
-| ダッシュボード | `dashboard/`, `admin/`, `analytics` |
+| 인증 | `auth/`, `login/`, `@clerk`, `@auth0`, `supabase` |
+| 결제 | `payment/`, `billing/`, `stripe`, `@stripe` |
+| 대시보드 | `dashboard/`, `admin/`, `analytics` |
 | API | `api/`, `routes/`, `trpc`, `graphql` |
 | DB | `prisma/`, `drizzle/`, `@supabase` |
 
-**実行コマンド**:
+**실행 명령**:
 ```bash
-# ディレクトリ構造から機能を推測
+# 디렉토리 구조에서 기능을 추정
 find src app -type d -name "auth" -o -name "login" -o -name "dashboard" 2>/dev/null
 
-# パッケージから機能を推測
+# 패키지에서 기능을 추정
 grep -E "clerk|stripe|supabase|prisma" package.json
 ```
 
-### 3. UIコンポーネント検出
+### 3. UI 컴포넌트 감지
 
-| 項目 | 検出方法 |
+| 항목 | 감지 방법 |
 |------|---------|
-| ページ数 | `app/**/page.tsx` または `pages/**/*.tsx` のカウント |
-| コンポーネント数 | `components/**/*.tsx` のカウント |
-| UIライブラリ | `shadcn`, `radix`, `chakra`, `mui` の検出 |
+| 페이지 수 | `app/**/page.tsx` 또는 `pages/**/*.tsx` 의 카운트 |
+| 컴포넌트 수 | `components/**/*.tsx` 의 카운트 |
+| UI 라이브러리 | `shadcn`, `radix`, `chakra`, `mui` 의 감지 |
 
-**実行コマンド**:
+**실행 명령**:
 ```bash
-# ページ数カウント
+# 페이지 수 카운트
 find . -name "page.tsx" -o -name "page.jsx" 2>/dev/null | wc -l
 
-# コンポーネント数カウント
+# 컴포넌트 수 카운트
 find . -path "*/components/*" -name "*.tsx" 2>/dev/null | wc -l
 ```
 
-### 4. プロジェクト資産解析
+### 4. 프로젝트 자산 분석
 
-| 資産 | 用途 |
+| 자산 | 용도 |
 |------|------|
-| `package.json` | プロジェクト名、description |
-| `README.md` | プロジェクト概要、タグライン |
-| `Plans.md` | 完了タスク（リリースノート用） |
-| `CHANGELOG.md` | 変更点（リリースノート用） |
-| `.claude/memory/decisions.md` | 技術的意思決定（アーキテクチャ解説用） |
+| `package.json` | 프로젝트명, description |
+| `README.md` | 프로젝트 개요, 태그라인 |
+| `Plans.md` | 완료タスク（릴리스 노트용）|
+| `CHANGELOG.md` | 변경점（릴리스 노트용）|
+| `.claude/memory/decisions.md` | 기술적 의사결정（아키텍처 해설용）|
 
-**実行コマンド**:
+**실행 명령**:
 ```bash
-# プロジェクト情報抽出
+# 프로젝트 정보 추출
 cat package.json | jq '{name, description, version}'
 
 # README の最初の段落を抽出
@@ -87,45 +87,45 @@ head -20 README.md
 
 ---
 
-## 動画タイプ自動判定
+## 영상 타입 자동 판정
 
-### 判定ロジック
+### 판정 로직
 
 ```
-分析結果から動画タイプを判定:
+분석 결과에서 영상 타입을 판정:
     │
     ├─ CHANGELOG が最近更新（7日以内）
-    │   └─ → リリースノート動画
+    │   └─ → 릴리스 노트 영상
     │
-    ├─ 大きな構造変更（新ディレクトリ追加等）
-    │   └─ → アーキテクチャ解説
+    ├─ 큰 구조 변경（新ディレクトリ追加等）
+    │   └─ → 아키텍처 해설
     │
-    ├─ UI変更が多い（コンポーネント追加/変更）
-    │   └─ → プロダクトデモ
+    ├─ UI 변경 多（コンポーネント追加/変更）
+    │   └─ → 프로덕트 데모
     │
-    └─ 複数条件に該当
-        └─ → 複合動画（ユーザーに確認）
+    └─ 복수 조건に該当
+        └─ → 복합 영상（사용자에게 확인）
 ```
 
-### 判定基準
+### 판정 기준
 
-| タイプ | 条件 |
+| 타입 | 조건 |
 |--------|------|
-| **リリースノート** | `git log --since="7 days ago"` に tag/release がある |
-| **アーキテクチャ** | 新しい `src/*/` ディレクトリ、大きなリファクタ |
-| **プロダクトデモ** | UI コンポーネントの追加/変更 |
-| **デフォルト** | プロダクトデモ（最も汎用的） |
+| **릴리스 노트** | `git log --since="7 days ago"` 에 tag/release 가 있음 |
+| **아키텍처** | 새로운 `src/*/` 디렉토리, 대규모 리팩터 |
+| **프로덕트 데모** | UI 컴포넌트의 추가/변경 |
+| **기본값** | 프로덕트 데모（가장 범용적）|
 
 ---
 
-## 出力フォーマット
+## 출력 형식
 
-分析結果は以下の形式で出力:
+분석 결과는以下の 형식으로 출력:
 
 ```yaml
 project:
   name: "MyAwesomeApp"
-  description: "タスク管理を簡単に"
+  description: "태스크 관리를 쉽게"
   version: "1.2.0"
 
 framework:
@@ -133,11 +133,11 @@ framework:
   ui_library: "shadcn/ui"
 
 features:
-  - name: "認証"
+  - name: "인증"
     type: "auth"
     path: "src/app/(auth)/"
     provider: "Clerk"
-  - name: "ダッシュボード"
+  - name: "대시보드"
     type: "dashboard"
     path: "src/app/dashboard/"
   - name: "API"
@@ -153,8 +153,8 @@ recent_changes:
   changelog_updated: true
   last_release: "2026-01-20"
   major_changes:
-    - "認証フロー追加"
-    - "ダッシュボード改善"
+    - "인증 플로우 추가"
+    - "대시보드 개선"
 
 recommended_video_type: "release-notes"
 confidence: 0.85
@@ -162,39 +162,39 @@ confidence: 0.85
 
 ---
 
-## 実行例
+## 실행 예
 
 ```
-📊 プロジェクト分析中...
+📊 프로젝트 분석 중...
 
-✅ 分析完了
+✅ 분석 완료
 
-| 項目 | 結果 |
+| 항목 | 결과 |
 |------|------|
-| プロジェクト名 | MyAwesomeApp |
-| フレームワーク | Next.js 14 |
-| UIライブラリ | shadcn/ui |
-| ページ数 | 12 |
-| コンポーネント数 | 45 |
+| 프로젝트명 | MyAwesomeApp |
+| 프레임워크 | Next.js 14 |
+| UI 라이브러리 | shadcn/ui |
+| 페이지 수 | 12 |
+| 컴포넌트 수 | 45 |
 
-🔍 検出された機能:
-- 認証（Clerk）
-- ダッシュボード
-- API（8エンドポイント）
+🔍 감지된 기능:
+- 인증（Clerk）
+- 대시보드
+- API（8 엔드포인트）
 
-📋 最近の変更:
-- v1.2.0 リリース（3日前）
-- 認証フロー追加
-- ダッシュボード改善
+📋 최근 변경:
+- v1.2.0 릴리스（3일 전）
+- 인증 플로우 추가
+- 대시보드 개선
 
-🎬 推奨動画タイプ: リリースノート動画
-   理由: 最近のリリースがあり、主要な機能追加があります
+🎬 권장 영상 타입: 릴리스 노트 영상
+   이유: 최근 릴리스가 있고 주요 기능 추가가 있습니다
 ```
 
 ---
 
 ## Notes
 
-- 分析は非破壊的（ファイルを変更しない）
-- 大規模プロジェクトでも数秒で完了
-- 検出できない機能は手動で追加可能（planner.md で）
+- 분석은 비파괴적（파일을 변경하지 않음）
+- 대규모 프로젝트라도 수 초 내에 완료
+- 감지되지 않는 기능은 수동으로 추가 가능（planner.md 에서）

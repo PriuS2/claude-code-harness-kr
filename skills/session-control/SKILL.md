@@ -1,8 +1,7 @@
 ---
 name: session-control
 description: "/work のセッション resume/fork(branch) を --resume/--fork フラグに基づいて制御。session.json と session.events.jsonl を更新する内部ワークフロー専用スキル。Do NOT load for: user session management, login state, app state handling."
-description-en: "Controls session resume/fork(branch) for /work based on --resume/--fork flags. Updates session.json and session.events.jsonl. Internal workflow use only. Do NOT load for: user session management, login state, app state handling."
-description-ja: "/work のセッション resume/fork(branch) を --resume/--fork フラグに基づいて制御。session.json と session.events.jsonl を更新する内部ワークフロー専用スキル。Do NOT load for: user session management, login state, app state handling."
+description-ja: "/workのセッションresume/fork(branch)を--resume/--forkフラグに基づいて制御。session.jsonとsession.events.jsonlを更新する内部ワークフロー専用スキル。ユーザーセッション管理、ログイン状態アプリケーション状態管理には読み込まない。"
 allowed-tools: ["Read", "Bash", "Write", "Edit"]
 user-invocable: false
 ---

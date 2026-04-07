@@ -1,8 +1,7 @@
 ---
 name: session-state
 description: "SESSION_ORCHESTRATION.md に基づくセッション状態遷移管理。/work フェーズ境界での状態更新、エラー時の escalated 遷移、セッション再開時の initialized 復帰を制御。Internal workflow use only. Do NOT load for: user session management, login state, app state handling."
-description-en: "Manages session state transitions per SESSION_ORCHESTRATION.md. Controls state updates at /work phase boundaries, escalated transitions on error, and initialized restoration on session resume. Internal workflow use only. Do NOT load for: user session management, login state, app state handling."
-description-ja: "SESSION_ORCHESTRATION.md に基づくセッション状態遷移管理。/work フェーズ境界での状態更新、エラー時の escalated 遷移、セッション再開時の initialized 復帰を制御。Internal workflow use only. Do NOT load for: user session management, login state, app state handling."
+description-ja: "SESSION_ORCHESTRATION.md に基づくセッション状態遷移管理。/workフェーズ境界での状態更新、エラー時のescalated遷移、セッション再開時のinitialized復帰を制御、内部ワークフロー专用。ユーザーセッション管理、ログイン状態、アプリケーション状態管理には読み込まない。"
 allowed-tools: ["Read", "Bash"]
 user-invocable: false
 ---

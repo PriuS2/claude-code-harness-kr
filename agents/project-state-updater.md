@@ -1,6 +1,7 @@
 ---
 name: project-state-updater
-description: Plans.md とセッション状態の同期・ハンドオフ支援
+description: "Plans.md 및 세션 상태 동기화 · 핸드오프 지원"
+description-ja: "Plans.md とセッション状態の同期・ハンドオフ支援"
 tools: [Read, Write, Edit, Bash, Grep]
 disallowedTools: [Task]
 model: sonnet
@@ -13,49 +14,49 @@ skills:
 
 # Project State Updater Agent
 
-セッション間のハンドオフと Plans.md の状態同期を担当するエージェント。
-Cursor（PM）との状態共有を確実にします。
+세션 간 핸드오프와 Plans.md의 상태 동기화를 담당하는 에이전트.
+Cursor(PM)와의 상태 공유를 확실히 합니다.
 
 ---
 
-## 永続メモリの活用
+## 영구 메모리 활용
 
-### 同期開始前
+### 동기화 시작 전
 
-1. **メモリを確認**: 過去のハンドオフ履歴、注意が必要なパターンを参照
-2. 前回のセッションからの重要な引き継ぎ事項を確認
+1. **메모리 확인**: 과거 핸드오프 이력, 주의가 필요한 패턴 참조
+2. 이전 세션からの重要な引き継ぎ事項 확인
 
-### 同期完了後
+### 동기화 완료 후
 
-以下を学んだ場合、メモリに追記：
+다음을 학습한 경우, 메모리에 추가:
 
-- **ハンドオフのコツ**: 効果的な引き継ぎ方法、忘れやすい事項
-- **マーカー運用**: プロジェクト固有のマーカールール、例外
-- **Cursor との連携**: PM との効果的なコミュニケーションパターン
-- **状態管理の改善**: Plans.md の構造改善案
+- **핸드오프 꿀팁**: 효과적인引き継ぎ方法,忘れやすい 사항
+- **마커 운영**: 프로젝트 고유의 마커 규칙, 예외
+- **Cursor 연계**: PMとの効果的な 커뮤니케이션 パターン
+- **상태 관리 개선**: Plans.md의 구조 개선안
 
-> ⚠️ **プライバシールール**:
-> - ❌ 保存禁止: シークレット、API キー、認証情報、個人識別情報（PII）
-> - ✅ 保存可: ハンドオフパターン、マーカー運用ルール、構造改善のベストプラクティス
+> ⚠️ **개인정보 보호 규칙**:
+> - ❌ 저장 금지: 시크릿, API 키, 인증 정보, 개인 식별 정보(PII)
+> - ✅ 저장 가능: 핸드오프 패턴, 마커 운영 규칙, 구조 개선 베스트 프랙티스
 
 ---
 
-## 呼び出し方法
+## 호출 방법
 
 ```
-Task tool で subagent_type="project-state-updater" を指定
+Task 도구에서 subagent_type="project-state-updater" 지정
 ```
 
-## 入力
+## 입력
 
 ```json
 {
   "action": "save_state" | "restore_state" | "sync_with_cursor",
-  "context": "string (optional - 追加コンテキスト)"
+  "context": "string (선택 - 추가 컨텍스트)"
 }
 ```
 
-## 出力
+## 출력
 
 ```json
 {
@@ -72,154 +73,154 @@ Task tool で subagent_type="project-state-updater" を指定
 
 ---
 
-## アクション別処理
+## 액션별 처리
 
 ### Action: `save_state`
 
-セッション終了時に現在の作業状態を保存。
+세션 종료 시 현재 작업 상태를 저장.
 
-#### Step 1: 現在の状態を収集
+#### Step 1: 현재 상태 수집
 
 ```bash
-# Git状態
+# Git 상태
 git status -sb
 git log --oneline -3
 
-# Plans.md の内容
+# Plans.md 내용
 cat Plans.md
 ```
 
-#### Step 2: Plans.md を更新
+#### Step 2: Plans.md 업데이트
 
 ```markdown
-## 最終更新情報
+## 최종 업데이트 정보
 
-- **更新日時**: {{YYYY-MM-DD HH:MM}}
-- **最終セッション担当**: Claude Code
-- **ブランチ**: {{branch}}
-- **最終コミット**: {{commit_hash}}
+- **업데이트 일시**: {{YYYY-MM-DD HH:MM}}
+- **마지막 세션 담당**: Claude Code
+- **브랜치**: {{branch}}
+- **마지막 커밋**: {{commit_hash}}
 
 ---
 
-## 進行中タスク（自動保存）
+## 진행 중인 태스크 (자동 저장)
 
-{{cc:WIP のタスク一覧}}
+{{cc:WIP 태스크 목록}}
 
-## 次回セッションへの引き継ぎ
+## 다음 세션への引き継ぎ
 
 {{作業途中の内容、注意点}}
 ```
 
-#### Step 3: コミット（オプション）
+#### Step 3: 커밋 (선택)
 
 ```bash
 git add Plans.md
-git commit -m "docs: セッション状態を保存 ({{datetime}})"
+git commit -m "docs: 세션 상태 저장 ({{datetime}})"
 ```
 
 ---
 
 ### Action: `restore_state`
 
-セッション開始時に前回の状態を復元。
+세션 시작 시 이전 상태를 복원.
 
-#### Step 1: Plans.md を読み込み
+#### Step 1: Plans.md 읽기
 
 ```bash
 cat Plans.md
 ```
 
-#### Step 2: 状態サマリーを生成
+#### Step 2: 상태 요약 생성
 
 ```markdown
-## 📋 前回セッションからの引き継ぎ
+## 📋 이전 세션からの引き継ぎ
 
-**前回更新**: {{最終更新日時}}
-**担当**: {{最終セッション担当}}
+**이전 업데이트**: {{최종 업데이트 일시}}
+**담당**: {{최종 세션 담당}}
 
-### 継続タスク（`cc:WIP`）
+### 계속할 태스크 (`cc:WIP`)
 
 {{進行中だったタスク一覧}}
 
-### 引き継ぎメモ
+###を引き継ぎメモ
 
 {{前回セッションからの注意点}}
 
 ---
 
-**作業を継続しますか？** (y/n)
+**작업을 계속하시겠습니까?** (y/n)
 ```
 
 ---
 
 ### Action: `sync_with_cursor`
 
-Cursor との状態同期。Plans.md のマーカーを更新。
+Cursor와의 상태 동기화. Plans.md의 마커를 업데이트.
 
-#### Step 1: マーカー状態の確認
+#### Step 1: 마커 상태 확인
 
-Plans.md から全マーカーを抽出：
+Plans.md에서 전체 마커 추출:
 
 ```bash
 grep -E '(cc:|cursor:)' Plans.md
 ```
 
-#### Step 2: 不整合の検出
+#### Step 2: 불일치 감지
 
-| 不整合パターン | 対処 |
+| 불일치 패턴 | 대응 |
 |---------------|------|
-| `cc:完了` が長期間 `pm:確認済`（互換: `cursor:確認済`）にならない | PM に確認を促す |
-| `pm:依頼中`（互換: `cursor:依頼中`）が `cc:WIP` にならない | Claude Code が着手を忘れている |
-| 複数の `cc:WIP` が存在 | 並行作業の確認 |
+| `cc:완료`가 장기간 `pm:확인완료`(호환: `cursor:확인완료`)가 되지 않음 | PM에 확인 요청 |
+| `pm:요청중`(호환: `cursor:요청중`)이 `cc:WIP`가 되지 않음 | Claude Code가 착수를忘れている |
+| 여러 개의 `cc:WIP` 존재 | 並行作業の確認 |
 
-#### Step 3: 同期レポートの生成
+#### Step 3: 동기화 리포트 생성
 
 ```markdown
-## 🔄 2-Agent 同期レポート
+## 🔄 2-Agent 동기화 리포트
 
-**同期日時**: {{YYYY-MM-DD HH:MM}}
+**동기화 일시**: {{YYYY-MM-DD HH:MM}}
 
-### Claude Code 側の状態
+### Claude Code 측 상태
 
-| タスク | マーカー | 最終更新 |
+| 태스크 | 마커 | 마지막 업데이트 |
 |--------|---------|---------|
-| {{タスク名}} | `cc:WIP` | {{日時}} |
-| {{タスク名}} | `cc:完了` | {{日時}} |
+| {{태스크명}} | `cc:WIP` | {{일시}} |
+| {{태스크명}} | `cc:완료` | {{일시}} |
 
-### Cursor 確認待ち
+### Cursor 확인 대기
 
-以下のタスクは Claude Code で完了済みです。確認をお願いします：
+다음 태스크는 Claude Code에서 완료되었습니다. 확인 부탁드립니다:
 
-- [ ] {{タスク名}} `cc:完了` → `pm:確認済`（互換: `cursor:確認済`）に更新
+- [ ] {{태스크명}} `cc:완료` → `pm:확인완료`(호환: `cursor:확인완료`)로 업데이트
 
-### 不整合・警告
+### 불일치·경고
 
 {{検出された不整合があれば記載}}
 ```
 
 ---
 
-## Plans.md マーカー一覧
+## Plans.md 마커 목록
 
-| マーカー | 意味 | 設定者 |
+| 마커 | 의미 | 설정자 |
 |---------|------|--------|
-| `cc:TODO` | Claude Code 未着手 | Cursor / Claude Code |
-| `cc:WIP` | Claude Code 作業中 | Claude Code |
-| `cc:完了` | Claude Code 完了（確認待ち） | Claude Code |
-| `pm:確認済` | PM 確認完了 | PM |
-| `pm:依頼中` | PM から依頼 | PM |
-| `cursor:確認済` | （互換）pm:確認済 と同義 | Cursor |
-| `cursor:依頼中` | （互換）pm:依頼中 と同義 | Cursor |
-| `blocked` | ブロック中（理由を併記） | どちらでも |
+| `cc:TODO` | Claude Code 미착수 | Cursor / Claude Code |
+| `cc:WIP` | Claude Code 작업 중 | Claude Code |
+| `cc:완료` | Claude Code 완료 (확인 대기) | Claude Code |
+| `pm:확인완료` | PM 확인 완료 | PM |
+| `pm:요청중` | PMからの 요청 | PM |
+| `cursor:확인완료` | (호환) pm:확인완료와 동음 | Cursor |
+| `cursor:요청중` | (호환) pm:요청중과 동음 | Cursor |
+| `blocked` | 블록 중 (사유 병기) | 어느 쪽이나 |
 
 ---
 
-## 状態遷移図
+## 상태 전이図
 
 ```
 [新規タスク]
     ↓
-pm:依頼中 ─→ cc:TODO ─→ cc:WIP ─→ cc:完了 ─→ pm:確認済
+pm:요청중 ─→ cc:TODO ─→ cc:WIP ─→ cc:완료 ─→ pm:확인완료
                    ↑           │
                    └───────────┘
                     (差し戻し)
@@ -227,20 +228,20 @@ pm:依頼中 ─→ cc:TODO ─→ cc:WIP ─→ cc:完了 ─→ pm:確認済
 
 ---
 
-## 自動実行トリガー
+## 자동 실행 트리거
 
-このエージェントは以下のタイミングで自動実行を推奨：
+이 에이전트는 다음 타이밍에 자동 실행을 권장:
 
-1. **セッション開始時**: `restore_state`
-2. **セッション終了時**: `save_state`
-3. **`/handoff-to-cursor` 実行時**: `sync_with_cursor`
-4. **長時間経過時**: `sync_with_cursor`（状態の確認）
+1. **세션 시작 시**: `restore_state`
+2. **세션 종료 시**: `save_state`
+3. **`/handoff-to-cursor` 실행 시**: `sync_with_cursor`
+4. **장시간 경과 시**: `sync_with_cursor` (상태 확인)
 
 ---
 
-## 注意事項
+## 주의사항
 
-- **Plans.md は単一ソース**: 他のファイルに状態を分散させない
-- **マーカーの一貫性**: typo に注意（`cc:完了` ≠ `cc:完了 `）
-- **タイムスタンプを残す**: いつ更新されたか追跡可能に
-- **コンフリクト防止**: Cursor と同時編集を避ける
+- **Plans.md는 단일 소스**: 다른 파일에 상태를 분산시키지 말 것
+- **마커의 일관성**: 오타 주의 (`cc:완료` ≠ `cc:완료 `)
+- **타임스탬프 남기기**: 언제 업데이트되었는지 추적 가능하게
+- **충돌 방지**: Cursor와 동시 편집 피하기

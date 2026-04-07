@@ -1,8 +1,8 @@
 ---
 name: crud
-description: "CRUDをサクッと自動生成。ボイラープレートはAIにお任せ。Use when user mentions CRUD, entity generation, or wants to create API endpoints. Do NOT load for: UI component creation, form design, database schema discussions."
+description: "CRUD를 재빨리 자동생성. 보일러플레이트는 AI에게 맡기세요. Use when user mentions CRUD, entity generation, or wants to create API endpoints. Do NOT load for: UI component creation, form design, database schema discussions."
 description-en: "Auto-generate CRUD quickly. Boilerplate left to AI. Use when user mentions CRUD, entity generation, or wants to create API endpoints. Do NOT load for: UI component creation, form design, database schema discussions."
-description-ja: "CRUDをサクッと自動生成。ボイラープレートはAIにお任せ。Use when user mentions CRUD, entity generation, or wants to create API endpoints. Do NOT load for: UI component creation, form design, database schema discussions."
+description-ja: "CRUD를 재빨리 자동생성. 보일러플레이트는 AI에게 맡기세요. Use when user mentions CRUD, entity generation, or wants to create API endpoints. Do NOT load for: UI component creation, form design, database schema discussions."
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 argument-hint: "<entity-name>"
 user-invocable: false
@@ -10,31 +10,31 @@ user-invocable: false
 
 # CRUD Skill
 
-Auto-generates CRUD functionality for specified entities (tables) at **production-ready level**.
+지정된 엔티티(테이블)에 대해 **production-ready 수준**의 CRUD 기능을 자동 생성합니다.
 
 ## Quick Reference
 
-- "**Create CRUD for task management**" → `/crud tasks`
-- "**Want search and pagination too**" → Includes all together
-- "**Include permissions (who can view/edit)**" → Sets up authorization/rules together
+- "**task 관리를 위한 CRUD 생성해줘**" → `/crud tasks`
+- "**검색과 페이징도 추가해줘**" → 함께 포함
+- "**권한 포함해줘 (누가 보기/수정 가능)**" → authorization/rules 함께 설정
 
 ## Deliverables
 
-- CRUD + validation + authorization + tests, **complete production-safe set**
-- Minimize diff to match existing DB/code
+- CRUD + validation + authorization + tests, **완전한 production-safe 세트**
+- 기존 DB/code와 최소한의 diff 유지
 
-**Features**:
-- Validation (Zod) auto-add
-- Auth/authorization (Row Level Security) auto-config
-- Relations (one-to-many, many-to-many) support
+**기능**:
+- Validation (Zod) 자동 추가
+- Auth/authorization (Row Level Security) 자동 설정
+- Relations (one-to-many, many-to-many) 지원
 - Pagination, search, filters
-- Auto-generated test cases
+- 자동 생성된 테스트 케이스
 
 ---
 
 ## Auto-invoke Skills
 
-**This skill must explicitly invoke the following skills with the Skill tool**:
+**이 스킬은 다음 스킬을 반드시 Skill tool로 호출해야 합니다**:
 
 | Skill | Purpose | When to Call |
 |-------|---------|--------------|
@@ -45,32 +45,32 @@ Auto-generates CRUD functionality for specified entities (tables) at **productio
 
 ## Execution Flow
 
-Detailed steps are described in the phases below.
+상세 단계는 아래 phases를 참조하세요.
 
 ### Phase 1: Entity Analysis
 
-1. Parse entity name from $ARGUMENTS
-2. Detect existing schema (Prisma, Drizzle, raw SQL)
-3. Infer field types and relations
+1. $ARGUMENTS에서 entity name 파싱
+2. 기존 schema 감지 (Prisma, Drizzle, raw SQL)
+3. 필드 타입과 relations 추론
 
 ### Phase 2: CRUD Generation
 
-1. Generate model/schema if needed
-2. Create API endpoints (REST or tRPC)
-3. Add validation schemas (Zod)
-4. Configure authorization rules
+1. 필요시 model/schema 생성
+2. API endpoints 생성 (REST or tRPC)
+3. validation schemas 추가 (Zod)
+4. authorization rules 설정
 
 ### Phase 3: Test Generation
 
-1. Create unit tests for each endpoint
-2. Add integration tests
-3. Generate test fixtures
+1. 각 endpoint에 대한 unit tests 생성
+2. integration tests 추가
+3. test fixtures 생성
 
 ### Phase 4: Verification
 
-1. Run type check
-2. Run tests
-3. Verify build
+1. type check 실행
+2. tests 실행
+3. build 검증
 
 ---
 

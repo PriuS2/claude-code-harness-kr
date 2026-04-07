@@ -1,12 +1,12 @@
-# Remotion Visual Components
+# Remotion Visual Components - Remotion 시각 컴포넌트
 
-Phase 5: 視覚コンポーネント実装
+Phase 5: 시각 컴포넌트 구현
 
-## Components
+## 컴포넌트
 
 ### 1. EmphasisBox
 
-3段階の強調表示コンポーネント。
+3단계 강조 표시 컴포넌트.
 
 **Features**:
 - 3 levels: `high`, `medium`, `low`
@@ -47,7 +47,7 @@ import { EmphasisBox } from './components';
 
 ### 2. TransitionWrapper
 
-4種類のトランジションエフェクトでコンテンツをラップ。
+4종류의 트랜지션 이펙트로 콘텐츠를 래프.
 
 **Features**:
 - 4 types: `fade`, `slideIn`, `zoom`, `cut`
@@ -97,7 +97,7 @@ import { TransitionWrapper, TransitionPresets } from './components';
 
 ### 3. ProgressIndicator
 
-セクション位置表示コンポーネント。
+섹션 위치 표시 컴포넌트.
 
 **Features**:
 - 3 styles: `bar`, `dots`, `minimal`
@@ -153,7 +153,7 @@ interface Section {
 
 ### 4. BackgroundLayer
 
-5種類のアニメーション背景レイヤー。
+5종류의 애니메이션 배경 레이어.
 
 **Features**:
 - 5 types: `neutral`, `highlight`, `dramatic`, `tech`, `warm`
@@ -221,15 +221,15 @@ const bgType = getRecommendedBackground('intro'); // Returns 'highlight'
 
 ---
 
-## Integration with Schemas
+## 스키마와의 통합
 
-All components are designed to work with the Phase 4 schemas:
+모든 컴포넌트는 Phase 4 스키마와 함께 사용하도록 설계되었습니다:
 
 - `EmphasisBox` ← `emphasis.schema.json`
 - `TransitionWrapper` ← `animation.schema.json`
 - `BackgroundLayer` ← `direction.schema.json` (background section)
 
-**Example Integration**:
+**예시 통합**:
 ```typescript
 import { EmphasisBox, TransitionWrapper, BackgroundLayer } from './components';
 import { EmphasisSchema, AnimationSchema, DirectionSchema } from '../schemas';
@@ -262,32 +262,32 @@ const direction = DirectionSchema.parse(directionData);
 
 ---
 
-## Animation Performance
+## 애니메이션 성능
 
-All components use Remotion's native `interpolate` and `spring` functions for optimal performance:
+모든 컴포넌트는 최적의 성능을 위해 Remotion의 네이티브 `interpolate` 및 `spring` 함수를 사용합니다:
 
-- **CPU-efficient**: No heavy React re-renders
-- **Predictable**: Deterministic animations
-- **Smooth**: 60fps at 1920x1080
+- **CPU 효율적**: 과도한 React 리렌더링 없음
+- **예측 가능**: 결정적 애니메이션
+- **부드러움**: 1920x1080에서 60fps
 
-**Best Practices**:
-1. Use `spring` for natural motion (bounces, elastic)
-2. Use `interpolate` for linear/eased motion
-3. Avoid complex CSS filters in animated sections
-4. Prefer CSS transforms over layout changes
+**모범 사례**:
+1. 자연스러운 모션（바운스, 탄성）에는 `spring` 사용
+2. 선형/이징된 모션에는 `interpolate` 사용
+3. 애니메이션 섹션에서 복잡한 CSS 필터 피하기
+4. 레이아웃 변경보다 CSS 변형 선호
 
 ---
 
-## Testing
+## 테스트
 
-Each component can be tested individually in Remotion Studio:
+각 컴포넌트는 Remotion Studio에서 개별적으로 테스트할 수 있습니다:
 
 ```bash
 cd remotion
 npm run dev
 ```
 
-Create test compositions in `src/Root.tsx`:
+`src/Root.tsx` 에서 테스트 컴포지션을 생성합니다:
 
 ```tsx
 import { Composition } from 'remotion';
@@ -315,27 +315,27 @@ export const RemotionRoot = () => (
 
 ---
 
-## Next Steps
+## 다음 단계
 
-### Phase 6: Image Generation Patterns
+### Phase 6: 이미지 생성 패턴
 
-Now that visual components are implemented, integrate them with AI-generated images:
+시각 컴포넌트가 구현되었으므로, AI 생성 이미지와 통합합니다:
 
-1. **Task 6.1**: Define `visual-patterns.schema.json`
-2. **Task 6.2**: Create image prompt templates
-3. **Task 6.3**: Implement comparison/concept/flow patterns
-4. **Task 6.4**: Integrate with Nano Banana Pro
+1. **Task 6.1**: `visual-patterns.schema.json` 정의
+2. **Task 6.2**: 이미지 프롬프트 템플릿 생성
+3. **Task 6.3**: comparison/concept/flow 패턴 구현
+4. **Task 6.4**: Nano Banana Pro 와 통합
 
-### Integration Points
+### 통합 포인트
 
-- Use `BackgroundLayer` with AI-generated backgrounds
-- Overlay `EmphasisBox` on AI-generated diagrams
-- Animate AI images with `TransitionWrapper`
-- Show generation progress with `ProgressIndicator`
+- AI 생성 배경과 함께 `BackgroundLayer` 사용
+- AI 생성 다이어그램에 `EmphasisBox` 오버레이
+- `TransitionWrapper` 로 AI 이미지 애니메이션
+- `ProgressIndicator` 로 생성 진행률 표시
 
 ---
 
-## License
+## 라이선스
 
-Part of Claude Code Harness - generate-video skill.
-MIT License.
+Claude Code Harness - generate-video skill의 일부.
+MIT 라이선스.

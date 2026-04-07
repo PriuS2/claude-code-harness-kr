@@ -1,38 +1,38 @@
 # AI Snapshot Workflow
 
-agent-browser の `snapshot` コマンドを活用した AI エージェント向けワークフロー。
+agent-browser의 `snapshot` 커맨드를活用한 AI 에이전트向け 워크플로.
 
 ---
 
-## 概要
+## 개요
 
-`snapshot` コマンドは、ページのアクセシビリティツリーを取得し、各要素に参照 ID（`@e1`, `@e2` など）を付与します。これにより：
+`snapshot` 커맨드는 페이지의 접근성 트리를 취득하여, 각 요소에 참조 ID（`@e1`, `@e2` 等）를 부여합니다. これにより:
 
-1. **CSS セレクタ不要**: 動的な ID やクラス名に依存しない
-2. **コンテキスト把握**: 要素の役割（button, input, link）が明確
-3. **決定的操作**: `@e1` などの参照で確実に操作可能
+1. **CSSセレクタ不要**: 동적인 ID나 클래스 명에 의존하지 않음
+2. **컨텍스트 파악**: 요소의 역할（button, input, link）이 명확함
+3. **결정적 조작**: `@e1` などの参照で確実に操作可能
 
 ---
 
-## 基本ワークフロー
+## 基本 워크플로
 
-### Step 1: ページを開く
+### Step 1: 페이지 열기
 
 ```bash
 agent-browser open https://example.com
 ```
 
-### Step 2: スナップショット取得
+### Step 2: 스냅샷 취득
 
 ```bash
 agent-browser snapshot -i -c
 ```
 
-**オプション説明**:
-- `-i, --interactive`: インタラクティブな要素（ボタン、リンク、入力フィールド等）のみ表示
-- `-c, --compact`: 空の構造要素を除去してコンパクトに
+**옵션 설명**:
+- `-i, --interactive`: 인터랙티브한 요소（버튼, 링크, 입력 필드 等）만 표시
+- `-c, --compact`: 빈 구조 요소 제거해서 콤팩트하게
 
-**出力例**:
+**출력예**:
 ```
 ✓ Example Domain
   https://example.com/
@@ -44,253 +44,253 @@ agent-browser snapshot -i -c
 - button "Search" [ref=e5]
 ```
 
-### Step 3: 要素参照で操作
+### Step 3: 요소 참조로 조작
 
 ```bash
-# リンクをクリック
+# 링크를 클릭
 agent-browser click @e1
 
-# 検索フォームに入力
+# 검색 폼에 입력
 agent-browser fill @e4 "search query"
 
-# 検索ボタンをクリック
+# 검색 버튼을 클릭
 agent-browser click @e5
 ```
 
-### Step 4: 結果を確認
+### Step 4: 결과を確認
 
 ```bash
-# 新しい状態をスナップショット
+# 새로운 상태를 스냅샷
 agent-browser snapshot -i -c
 ```
 
 ---
 
-## Snapshot オプション詳細
+## Snapshot オプション詳解
 
 ### `-i, --interactive`
 
-インタラクティブな要素のみを表示。操作対象を絞り込む際に有効。
+인터랙티브한 요소만 표시. 조작 대상을 좁히고 싶을 때有効.
 
 ```bash
-# インタラクティブ要素のみ
+# 인터랙티브 요소만
 agent-browser snapshot -i
 
-# 全要素（テキストノード含む）
+# 전체 요소（텍스트 노드 포함）
 agent-browser snapshot
 ```
 
 ### `-c, --compact`
 
-空の構造要素（div, span など内容のないもの）を除去。
+빈 구조 요소（div, span 等 内容のないもの）を除去.
 
 ```bash
-# コンパクト出力
+# 콤팩트 출력
 agent-browser snapshot -c
 
-# 構造も含めて表示
+# 구조도 포함하여 표시
 agent-browser snapshot
 ```
 
 ### `-d, --depth <n>`
 
-ツリーの深さを制限。大きなページで概要を把握する際に有効。
+트리의 깊이를 제한. 큰 페이지에서 개요를 파악하고 싶을 때有効.
 
 ```bash
-# 深さ3まで
+# 깊이 3까지
 agent-browser snapshot -d 3
 ```
 
 ### `-s, --selector <sel>`
 
-特定のセレクタにスコープを絞る。
+특정 셀렉터에 스코프를絞る.
 
 ```bash
-# フォーム内のみ
+# 폼 내만
 agent-browser snapshot -s "form.login"
 
-# ナビゲーション内のみ
+# 네비게이션 내만
 agent-browser snapshot -s "nav"
 ```
 
-### 組み合わせ
+### 조합
 
 ```bash
-# 推奨: インタラクティブ + コンパクト
+# 권장: 인터랙티브 + 콤팩트
 agent-browser snapshot -i -c
 
-# フォーム内のインタラクティブ要素のみ
+# 폼 내의 인터랙티브 요소만
 agent-browser snapshot -i -c -s "form"
 
-# 浅いツリーで概要把握
+# 얕은 트리로 개요 파악
 agent-browser snapshot -i -d 2
 ```
 
 ---
 
-## ユースケース別ワークフロー
+## 유즈케이스별 워크플로
 
-### ログインフロー
+### 로그인 플로
 
 ```bash
-# 1. ログインページを開く
+# 1. 로그인 페이지를 열기
 agent-browser open https://example.com/login
 
-# 2. スナップショット取得
+# 2. 스냅샷 취득
 agent-browser snapshot -i -c
-# 出力:
+# 출력:
 # - input "Email" [ref=e1]
 # - input "Password" [ref=e2]
 # - button "Login" [ref=e3]
 # - link "Forgot password?" [ref=e4]
 
-# 3. ログイン情報を入力
+# 3. 로그인 정보 입력
 agent-browser fill @e1 "user@example.com"
 agent-browser fill @e2 "password123"
 
-# 4. ログインボタンをクリック
+# 4. 로그인 버튼 클릭
 agent-browser click @e3
 
-# 5. 結果を確認
+# 5. 결과 확인
 agent-browser snapshot -i -c
 agent-browser get url
 ```
 
-### フォーム送信
+### 폼 전송
 
 ```bash
-# 1. フォームページを開く
+# 1. 폼 페이지를 열기
 agent-browser open https://example.com/contact
 
-# 2. フォーム内のスナップショット
+# 2. 폼 내의 스냅샷
 agent-browser snapshot -i -c -s "form"
-# 出力:
+# 출력:
 # - input "Name" [ref=e1]
 # - input "Email" [ref=e2]
 # - textarea "Message" [ref=e3]
 # - button "Send" [ref=e4]
 
-# 3. フォームに入力
+# 3. 폼에 입력
 agent-browser fill @e1 "John Doe"
 agent-browser fill @e2 "john@example.com"
 agent-browser fill @e3 "Hello, this is a test message."
 
-# 4. 送信
+# 4. 전송
 agent-browser click @e4
 
-# 5. 確認
+# 5. 확인
 agent-browser snapshot -i -c
 ```
 
-### ナビゲーション探索
+### 네비게이션 탐색
 
 ```bash
-# 1. トップページを開く
+# 1. 토프 페이지를 열기
 agent-browser open https://example.com
 
-# 2. ナビゲーションを確認
+# 2. 네비게이션 확인
 agent-browser snapshot -i -c -s "nav"
-# 出力:
+# 출력:
 # - link "Home" [ref=e1]
 # - link "Products" [ref=e2]
 # - link "About" [ref=e3]
 # - link "Contact" [ref=e4]
 
-# 3. Products ページへ
+# 3. Products 페이지로
 agent-browser click @e2
 
-# 4. 新しいページの構造を確認
+# 4. 새로운 페이지의 구조 확인
 agent-browser snapshot -i -c
 ```
 
-### 動的コンテンツの操作
+### 동적 콘텐츠의 조작
 
 ```bash
-# 1. ページを開く
+# 1. 페이지 열기
 agent-browser open https://example.com/dashboard
 
-# 2. 初期スナップショット
+# 2. 초기 스냅샷
 agent-browser snapshot -i -c
 
-# 3. ドロップダウンを開く
+# 3. 드롭다운 열기
 agent-browser click @e5
 
-# 4. 待機（動的コンテンツのロード）
+# 4. 대기（동적 콘텐츠의 로드）
 agent-browser wait 500
 
-# 5. 新しいスナップショット（ドロップダウンメニューが表示される）
+# 5. 새로운 스냅샷（드롭다운 메뉴가 표시됨）
 agent-browser snapshot -i -c
-# 新しい要素が出現:
+# 새로운 요소が出현:
 # - menuitem "Option 1" [ref=e10]
 # - menuitem "Option 2" [ref=e11]
 # - menuitem "Option 3" [ref=e12]
 
-# 6. オプションを選択
+# 6. 옵션을 선택
 agent-browser click @e11
 ```
 
 ---
 
-## トラブルシューティング
+## 트러블슈팅
 
-### 要素が見つからない
+### 요소를 찾을 수 없는 경우
 
 ```bash
-# フルスナップショット（すべての要素）
+# 풀 스냅샷（모든 요소）
 agent-browser snapshot
 
-# 特定セレクタで絞り込み
+# 특정 셀렉터로 좁히기
 agent-browser snapshot -s "#target-element"
 
-# 待機してから再試行
+# 대기 후 재시도
 agent-browser wait 2000
 agent-browser snapshot -i -c
 ```
 
-### 動的ページ
+### 동적 페이지
 
 ```bash
-# JavaScript 実行後にスナップショット
+# JavaScript 실행 후 스냅샷
 agent-browser eval "document.querySelector('#load-more').click()"
 agent-browser wait 1000
 agent-browser snapshot -i -c
 ```
 
-### iframe 内の要素
+### iframe 내의 요소
 
 ```bash
-# メインフレームのスナップショット
+# 메인 프레임의 스냅샷
 agent-browser snapshot -i -c
 
-# iframe 内は直接アクセスできないため、
-# eval で iframe 内の操作を行う
+# iframe 내는 직접 액세스할 수 없으므로,
+# eval로 iframe 내의 조작을 행함
 agent-browser eval "document.querySelector('iframe').contentDocument.querySelector('button').click()"
 ```
 
 ---
 
-## ベストプラクティス
+## 베스트 프랙티스
 
-### 1. 常にスナップショットから開始
+### 1. 항상 스냅샷부터 시작
 
-操作前に必ずスナップショットを取得し、現在の状態を把握する。
+조작 전에 반드시 스냅샷을 취득하여, 현재의 상태를 파악합니다.
 
-### 2. インタラクティブ + コンパクトをデフォルトに
+### 2. 인터랙티브 + 콤팩트를 기본으로
 
 ```bash
 agent-browser snapshot -i -c
 ```
 
-### 3. 操作後は状態を確認
+### 3. 조작 후는 상태를 확인
 
 ```bash
 agent-browser click @e1
-agent-browser snapshot -i -c  # 結果を確認
+agent-browser snapshot -i -c  # 결과 확인
 ```
 
-### 4. 適切な待機を入れる
+### 4. 적절한 대기를 넣을 것
 
-動的コンテンツがある場合は待機を入れる：
+동적 콘텐츠가 있는 경우는 대기를 넣을 것:
 
 ```bash
 agent-browser click @e1
@@ -298,13 +298,13 @@ agent-browser wait 500
 agent-browser snapshot -i -c
 ```
 
-### 5. セッションを活用
+### 5. 세션을 활용할 것
 
-認証状態を維持するためにセッションを使用：
+인증 상태를 유지하기 위해서 세션을 사용:
 
 ```bash
 agent-browser --session myapp open https://example.com/login
-# ... ログイン操作 ...
-# 以降、同じセッションで操作を継続
+# ... 로그인 조작 ...
+# 이후, 같은 세션으로 조작 계속
 agent-browser --session myapp open https://example.com/dashboard
 ```

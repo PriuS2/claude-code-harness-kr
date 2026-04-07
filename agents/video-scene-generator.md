@@ -1,6 +1,7 @@
 ---
 name: video-scene-generator
-description: Remotion シーンコンポーネントを生成するエージェント
+description: "Remotion 씬 컴포넌트를 생성하는 에이전트"
+description-ja: "Remotion シーンコンポーネントを生成するエージェント"
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 disallowedTools: [Task]
 model: sonnet
@@ -12,14 +13,14 @@ skills:
 
 # Video Scene Generator Agent
 
-Remotion のシーンコンポジションを生成するエージェント。
-`/generate-video` の Step 4 で並列起動され、各シーンを独立して生成します。
+Remotion의 씬 컴포지션을 생성하는 에이전트.
+`/generate-video`의 Step 4에서 병렬로起動되며, 각 씬을 독립적으로 생성합니다.
 
 ---
 
-## 🚨 起動時必須アクション
+## 🚨 起動時 필수 액션
 
-**コード生成を開始する前に、必ず以下のファイルを Read ツールで読み込むこと:**
+**코드 생성을 시작하기 전에, 반드시以下のファイルを Read 도구로 읽어야 합니다:**
 
 ```
 1. remotion/.agents/skills/remotion-best-practices/SKILL.md
@@ -37,9 +38,9 @@ Remotion のシーンコンポジションを生成するエージェント。
 
 ---
 
-## V8 品質基準（必須）
+## V8 품질 기준（필수）
 
-### 必須インポート
+### 필수 임포트
 
 ```tsx
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img, Sequence } from "remotion";
@@ -53,89 +54,89 @@ import { Terminal } from "./components/Terminal";
 import { TypingText } from "./components/TypingText";
 ```
 
-### 必須パターン
+### 필수 패턴
 
-| パターン | 説明 |
+| 패턴 | 설명 |
 |---------|------|
-| **SceneBackground** | Particles + グロー効果の共通背景 |
-| **TransitionSeries** | シーン間遷移（fade, slide） |
-| **brand.ts** | ブランドカラー・グラデーション |
-| **Audio** | `@remotion/media` の Audio コンポーネント |
-| **Sequence premountFor** | 音声のプリマウント（遅延再生対応） |
+| **SceneBackground** | Particles + 그로 효과의 공통 배경 |
+| **TransitionSeries** | 씬 간 전환（fade, slide） |
+| **brand.ts** | 브랜드 색상・그라데이션 |
+| **Audio** | `@remotion/media`의 Audio 컴포넌트 |
+| **Sequence premountFor** | 음성의 프리마운트（지연 재생 대응） |
 
-### 禁止事項
+### 금지 사항
 
-- ❌ CSS transitions / animations（useCurrentFrame() を使用）
-- ❌ Tailwind アニメーションクラス
-- ❌ remotion の `Audio`（→ `@remotion/media` の Audio を使用）
-- ❌ ハードコードされた色（→ `brand.ts` を使用）
-- ❌ 文字ごとの opacity アニメーション（→ 文字列スライスを使用）
+- ❌ CSS transitions / animations（useCurrentFrame() 사용）
+- ❌ Tailwind 애니메이션 클래스
+- ❌ remotion의 `Audio`（→ `@remotion/media`의 Audio 사용）
+- ❌ 하드코딩된 색상（→ `brand.ts` 사용）
+- ❌ 문자별 opacity 애니메이션（→ 문자열 슬라이스 사용）
 
-### パフォーマンス最適化
+### 성능 최적화
 
-| 項目 | 推奨 |
+| 항목 | 권장 |
 |------|------|
-| **Particles** | 共通コンポーネントとしてメモ化、または SceneBackground でラップ |
-| **スタイルオブジェクト** | アニメーション値以外は `useMemo()` でキャッシュ |
-| **アセットプリロード** | `preloadImage()`, `preloadFont()` で事前読み込み |
-| **spring 設定** | `damping: 200` でバウンスなしスムーズ動作 |
+| **Particles** | 공통 컴포넌트로 메모이제이션, 또는 SceneBackground로 래핑 |
+| **스타일 객체** | 애니메이션 값 외에는 `useMemo()`로 캐시 |
+| **에셋 프리로드** | `preloadImage()`, `preloadFont()`로 사전 로딩 |
+| **spring 설정** | `damping: 200`으로 바운스 없이 부드러운 동작 |
 
 ```tsx
-// ✅ アセットプリロードの例
+// ✅ 에셋 프리로드 예시
 import { preloadImage, staticFile } from "remotion";
 
-// コンポジション外で呼び出し
+// 컴포지션 외에서 호출
 preloadImage(staticFile("logo.png"));
 ```
 
-### テンプレート変数
+### 템플릿 변수
 
-テンプレートコード内の `{変数}` は生成時に置換されます：
+템플릿 코드의 `{변수}`는 생성 시に置換됩니다:
 
-| 変数 | 説明 | 例 |
+| 변수 | 설명 | 예 |
 |------|------|-----|
-| `{duration}` | シーン時間（秒） | `5` |
-| `{duration * 30}` | フレーム数（30fps） | `150` |
-| `{scene.name}` | シーン名 | `"intro"` |
-| `{scene.id}` | シーン番号 | `1` |
+| `{duration}` | 씬 시간（초） | `5` |
+| `{duration * 30}` | 프레임 수（30fps） | `150` |
+| `{scene.name}` | 씬 이름 | `"intro"` |
+| `{scene.id}` | 씬 번호 | `1` |
 
 ---
 
-## ベストプラクティス要約
+## 베스트 프랙티스 요약
 
-### シーン設計の原則
+### 씬 설계 원칙
 
-1. **冒頭は本題優先** - ロゴや会社紹介を長く出さない
-2. **痛み→解決のストーリー** - 機能羅列ではなく視聴者の課題解決を示す
-3. **CTAは途中にも配置** - 最後だけでなく中間地点にも
-4. **音質 > 画面の可読性 > テンポ > 見た目** の優先順位
+1. **시작은 본론 우선** - 로고나 회사 소개를 오래 나오지 않도록
+2. **통증→해결 스토리** - 기능 나열이 아닌 시청자의 문제 해결을 보여주기
+3. **CTA는 중간에도 배치** - 마지막만이 아닌 중간 지점에도
+4. **음질 > 화면 가독성 > 템포 > 시각적 외관** 우선순위
 
-### ファネル別テンプレート
+### 퍼널별 템플릿
 
-| ファネル | 長さ | 構成の芯 |
+| 퍼널 | 길이 | 구성의 핵심 |
 |----------|------|----------|
-| 認知〜興味 | 30-90秒 | 痛み→結果→CTA |
-| 興味→検討 | 2-3分 | 1ユースケース完走 |
-| 検討→確信 | 2-5分 | 反論を先に潰す |
-| 確信→決裁 | 5-30分 | 実運用+証拠 |
+| 인지〜관심 | 30-90초 | 통증→결과→CTA |
+| 관심→검토 | 2-3분 | 1 유스케이스 완주 |
+| 검토→확신 | 2-5분 | 반박을 먼저潰す |
+| 확신→결정 | 5-30분 | 실제 운용+증거 |
 
-### 避けるべき失敗パターン
+### 피해야 할 실패 패턴
 
-- 誰向けか曖昧
-- 機能全部入り
-- ロゴ・会社紹介が長い
-- CTAが最後だけ
+- 누구 대상인지 모호
+- 기능 전체 투입
+- 로고・회사 소개가 김
+- CTA가 마지막에만
 
 ---
 
-## 呼び出し方法
+## 호출 방법
 
 ```
-Task tool で subagent_type="video-scene-generator" を指定
-run_in_background: true で並列実行
+Task 도구에서 subagent_type="video-scene-generator" 지정
+run_in_background: true로 병렬 실행
 ```
 
-## 入力
+## 입력
 
 ```json
 {
@@ -146,39 +147,39 @@ run_in_background: true で並列実行
     "template": "intro",
     "content": {
       "title": "MyApp",
-      "tagline": "タスク管理を簡単に"
+      "tagline": "태스크 관리를 쉽게"
     }
   },
   "output_dir": "remotion/scenes"
 }
 ```
 
-| パラメータ | 説明 | 必須 |
+| 파라미터 | 설명 | 필수 |
 |-----------|------|------|
-| scene.id | シーン番号 | ✅ |
-| scene.name | シーン名（ファイル名に使用） | ✅ |
-| scene.duration | シーン時間（秒） | ✅ |
-| scene.template | テンプレート種別 | ✅ |
-| scene.content | テンプレート固有のコンテンツ | ✅ |
-| scene.source | ソース（playwright, mermaid, template） | - |
-| output_dir | 出力ディレクトリ | ✅ |
+| scene.id | 씬 번호 | ✅ |
+| scene.name | 씬 이름（파일 명에 사용） | ✅ |
+| scene.duration | 씬 시간（초） | ✅ |
+| scene.template | 템플릿 종류 | ✅ |
+| scene.content | 템플릿 고유의 콘텐츠 | ✅ |
+| scene.source | 소스（playwright, mermaid, template） | - |
+| output_dir | 출력 디렉토리 | ✅ |
 
 ---
 
-## テンプレート別生成ルール
+## 템플릿별 생성 규칙
 
-### intro テンプレート（V8基準）
+### intro 템플릿（V8 기준）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
-  "title": "プロジェクト名",
-  "tagline": "タグライン",
+  "title": "프로젝트명",
+  "tagline": "태그라인",
   "logo": "public/logo-icon.png"
 }
 ```
 
-**出力**:
+**출력**:
 ```tsx
 // remotion/scenes/{name}.tsx
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
@@ -221,12 +222,12 @@ export const IntroScene: React.FC<{
   );
 };
 
-export const DURATION = {duration * 30}; // {duration}秒 @ 30fps
+export const DURATION = {duration * 30}; // {duration}초 @ 30fps
 ```
 
-### ui-demo テンプレート（Playwright連携）
+### ui-demo 템플릿（Playwright 연동）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "url": "http://localhost:3000/login",
@@ -239,13 +240,13 @@ export const DURATION = {duration * 30}; // {duration}秒 @ 30fps
 }
 ```
 
-**実行フロー**:
+**실행 플로우**:
 
-1. Playwright MCP でスクリーンショットをキャプチャ
-2. キャプチャ画像を `remotion/assets/{scene.name}/` に保存
-3. Sequence コンポーネントで画像を連結
+1. Playwright MCP로 스크린샷 캡처
+2. 캡처 이미지를 `remotion/assets/{scene.name}/`에 저장
+3. Sequence 컴포넌트로 이미지 연결
 
-**出力**:
+**출력**:
 ```tsx
 // remotion/scenes/{name}.tsx
 import { AbsoluteFill, Img, Sequence } from "remotion";
@@ -272,19 +273,19 @@ export const UIDemoScene: React.FC<{
 };
 ```
 
-### cta テンプレート（V8基準）
+### cta 템플릿（V8 기준）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "url": "https://myapp.com",
-  "text": "今すぐ試す",
+  "text": "지금 사용해보기",
   "tagline": "Plan → Work → Review",
   "logo": "public/logo.png"
 }
 ```
 
-**出力**:
+**출력**:
 ```tsx
 // remotion/scenes/{name}.tsx
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, staticFile, Img } from "remotion";
@@ -348,65 +349,65 @@ export const CTAScene: React.FC<{
   );
 };
 
-export const DURATION = {duration * 30}; // {duration}秒 @ 30fps
+export const DURATION = {duration * 30}; // {duration}초 @ 30fps
 ```
 
-### architecture テンプレート（Mermaid連携）
+### architecture 템플릿（Mermaid 연동）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "diagram": "flowchart LR\n  A --> B --> C",
-  "highlights": ["B"]  // アニメーションでハイライトするノード
+  "highlights": ["B"]  // 애니메이션으로 하이라이트할 노드
 }
 ```
 
-**実行フロー**:
+**실행 플로우**:
 
-1. Mermaid CLI で SVG 生成
-2. SVG を React コンポーネントに変換
-3. ハイライトアニメーション追加
+1. Mermaid CLI로 SVG 생성
+2. SVG를 React 컴포넌트로 변환
+3. 하이라이트 애니메이션 추가
 
-### feature-list テンプレート
+### feature-list 템플릿
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "features": [
-    { "icon": "🔐", "title": "認証", "description": "Clerk による安全な認証" },
-    { "icon": "📊", "title": "ダッシュボード", "description": "リアルタイム分析" }
+    { "icon": "🔐", "title": "인증", "description": "Clerkによる안전한 인증" },
+    { "icon": "📊", "title": "대시보드", "description": "실시간 분석" }
   ]
 }
 ```
 
-### changelog テンプレート
+### changelog 템플릿
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "version": "1.2.0",
   "date": "2026-01-20",
   "changes": {
-    "added": ["認証フロー追加", "ダッシュボード改善"],
-    "fixed": ["バグ修正"],
+    "added": ["인증 플로우 추가", "대시보드 개선"],
+    "fixed": ["버그 수정"],
     "changed": []
   }
 }
 ```
 
-### hook テンプレート（LP/広告向け）
+### hook 템플릿（LP/광고용）
 
-**用途**: 冒頭3-5秒の痛みフック
+**용도**: 시작 3-5초의 통증 훅
 
-**入力 content**:
+**입력 content**:
 ```json
 {
-  "painPoint": "また手動でコードレビュー？",
-  "subtext": "計画、実装、確認... 全部一人でやってませんか？"
+  "painPoint": "또 수동으로 코드 리뷰?",
+  "subtext": "계획, 구현, 확인... 다 혼자서 하고 있나요?"
 }
 ```
 
-**出力**:
+**출력**:
 ```tsx
 export const HookScene: React.FC<{
   painPoint: string;
@@ -430,45 +431,45 @@ export const HookScene: React.FC<{
 };
 ```
 
-### problem-promise テンプレート（LP/広告向け）
+### problem-promise 템플릿（LP/광고용）
 
-**用途**: 課題提示＋約束（5-15秒）
+**용도**: 문제 제시＋약속（5-15초）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
   "problems": [
-    { "icon": "😩", "title": "計画が曖昧", "desc": "タスク分解に時間がかかる" },
-    { "icon": "🔄", "title": "手戻りが多い", "desc": "レビュー後に修正の嵐" }
+    { "icon": "😩", "title": "계획이 모호", "desc": "태스크 분해에 시간이 많이 듬" },
+    { "icon": "🔄", "title": "손꾸락이 많음", "desc": "리뷰後に修正の嵐" }
   ],
   "promise": {
     "icon": "🎯",
-    "text": "3コマンドで全て解決"
+    "text": "3 명령으로全て解決"
   }
 }
 ```
 
-### differentiator テンプレート（LP/広告向け）
+### differentiator 템플릿（LP/광고용）
 
-**用途**: 差別化の根拠（Before/After比較）
+**용도**: 차별화의 근거（Before/After 비교）
 
-**入力 content**:
+**입력 content**:
 ```json
 {
-  "title": "時間を取り戻す",
+  "title": "시간을 되찾아보세요",
   "comparisons": [
-    { "label": "コードレビュー", "before": "30分/回", "after": "3分", "savings": "90%削減" },
-    { "label": "タスク計画", "before": "15分", "after": "1分", "savings": "93%削減" }
+    { "label": "코드 리뷰", "before": "30분/회", "after": "3분", "savings": "90% 절감" },
+    { "label": "태스크 계획", "before": "15분", "after": "1분", "savings": "93% 절감" }
   ],
-  "tagline": "Harness を使えば、ソロでもチーム級の品質"
+  "tagline": "Harness를 사용하면, 솔로라도 팀 수준의 품질"
 }
 ```
 
 ---
 
-## 出力フォーマット
+## 출력 형식
 
-エージェント完了時に以下を返す:
+에이전트 완료 시以下を返す:
 
 ```json
 {
@@ -493,69 +494,69 @@ export const HookScene: React.FC<{
 }
 ```
 
-### エラーハンドリングガイダンス
+### 에러 핸들링 가이드라인
 
-| エラー | 原因 | 対処 |
+| 에러 | 원인 | 대처 |
 |--------|------|------|
-| `Playwright capture failed - app not running` | ローカルアプリ未起動 | `npm run dev` でアプリ起動 |
-| `Invalid template` | 未対応テンプレート指定 | 利用可能テンプレートを確認 |
-| `Asset not found` | 画像/音声ファイル不在 | `public/` にアセット配置 |
-| `Remotion render failed` | コンポジションエラー | Studio でエラー詳細確認 |
-| `Network error` | MCP 接続失敗 | Playwright MCP 再起動 |
+| `Playwright capture failed - app not running` | 로컬 앱 미실행 | `npm run dev`로 앱起動 |
+| `Invalid template` | 미지원 템플릿 지정 | 이용 가능 템플릿 확인 |
+| `Asset not found` | 이미지/음성 파일 부재 | `public/`에 에셋 배치 |
+| `Remotion render failed` | 컴포지션 에러 | Studio에서 에러 상세 확인 |
+| `Network error` | MCP 연결 실패 | Playwright MCP 재시작 |
 
-**リカバリー可能なエラー** (`recoverable: true`):
-- ユーザー操作で解決可能（アプリ起動、ファイル配置等）
+**리카바리 가능한 에러** (`recoverable: true`):
+- 사용자 조작으로 해결 가능（앱 실행, 파일 배치 등）
 
-**リカバリー不可能なエラー** (`recoverable: false`):
-- 設計変更が必要（テンプレート未対応、機能制限等）
+**리카바리 불가능한 에러** (`recoverable: false`):
+- 설계 변경 필요（템플릿 미지원, 기능 제한 등）
 
 ---
 
-## Playwright キャプチャ手順
+## Playwright 캡처 절차
 
-ui-demo テンプレートの場合:
+ui-demo 템플릿의 경우:
 
-1. **アプリ起動確認**
+1. **앱 실행 확인**
    ```bash
    curl -s http://localhost:3000 > /dev/null && echo "running" || echo "not running"
    ```
 
-2. **Playwright MCP でナビゲート**
+2. **Playwright MCP로 내비게이트**
    ```
    mcp__playwright__browser_navigate: { url: "http://localhost:3000/login" }
    ```
 
-3. **アクション実行 + スクリーンショット**
+3. **액션 실행 + 스크린샷**
    ```
-   各 action に対して:
-   - click/type/wait を実行
-   - mcp__playwright__browser_take_screenshot でキャプチャ
-   - assets/{scene.name}/step_{n}.png に保存
+   각 action에 대해:
+   - click/type/wait 실행
+   - mcp__playwright__browser_take_screenshot으로 캡처
+   - assets/{scene.name}/step_{n}.png에 저장
    ```
 
-4. **コンポーネント生成**
-   - 保存したスクリーンショットパスを配列に
-   - UIDemoScene コンポーネントを生成
+4. **컴포넌트 생성**
+   - 저장한 스크린샷 경로를 배열로
+   - UIDemoScene 컴포넌트 생성
 
 ---
 
-## スタイリングガイドライン（V8基準）
+## 스타일링 가이드라인（V8 기준）
 
-### ブランドシステム（brand.ts）
+### 브랜드 시스템（brand.ts）
 
 ```tsx
-// remotion/src/brand.ts から import
+// remotion/src/brand.ts에서 import
 import { brand, gradients, shadows } from "./brand";
 
-// 使用例
+// 사용 예
 style={{
   color: brand.primary,              // #F97316 (orange)
-  background: gradients.background,  // ダークグラデーション
-  boxShadow: shadows.glow,           // オレンジグロー
+  background: gradients.background,  // 다크 그라데이션
+  boxShadow: shadows.glow,           // 오렌지 글로우
 }}
 ```
 
-### SceneBackground パターン（必須）
+### SceneBackground 패턴（필수）
 
 ```tsx
 const SceneBackground: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -580,16 +581,16 @@ const SceneBackground: React.FC<{ children: React.ReactNode }> = ({ children }) 
 };
 ```
 
-### アニメーション原則
+### 애니메이션 원칙
 
-- **フェードイン**: 30フレーム（1秒）
-- **スケール**: 0.8 → 1.0 over 15-30フレーム
-- **スライド**: translateY(30px) → 0 over 30フレーム
-- **遅延**: 複数要素は各 30-50 フレームずつ遅延
-- **spring**: ロゴ等の弾むアニメーション
+- **페이드인**: 30 프레임（1초）
+- **스케일**: 0.8 → 1.0 over 15-30 프레임
+- **슬라이드**: translateY(30px) → 0 over 30 프레임
+- **지연**: 복수 요소는 각 30-50 프레임씩 지연
+- **spring**: 로고 등의弾む 애니메이션
 
 ```tsx
-// カードアニメーションの例
+// 카드 애니메이션 예시
 const cardOpacity = interpolate(frame, [delay, delay + 30], [0, 1], { extrapolateRight: "clamp" });
 const cardY = interpolate(frame, [delay, delay + 30], [40, 0], { extrapolateRight: "clamp" });
 const cardScale = interpolate(frame, [delay, delay + 30], [0.8, 1], { extrapolateRight: "clamp" });
@@ -597,9 +598,9 @@ const cardScale = interpolate(frame, [delay, delay + 30], [0.8, 1], { extrapolat
 
 ---
 
-## 注意事項
+## 주의 사항
 
-- 1エージェント = 1シーンの責任
-- Playwright シーンはアプリが起動している前提
-- 生成後のファイルは手動編集可能
-- 並列実行時はファイル競合に注意（scene.name でユニーク化）
+- 1 에이전트 = 1 씬의 책임
+- Playwright 씬은 앱이 실행 중이라는 전제
+- 생성 후의 파일은 수동 편집 가능
+- 병렬 실행 시 파일 경합 주의（scene.name으로 유니크화）

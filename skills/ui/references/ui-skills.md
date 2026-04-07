@@ -1,6 +1,7 @@
 ---
 name: ui-skills-summary
 description: "UI Skills の制約セット要約（実装品質優先）"
+description-ja: "UI Skillsの制約セット要約。実装品質優先で破綻しやすいポイントを防ぐためのもの。"
 ---
 
 # UI Skills Summary

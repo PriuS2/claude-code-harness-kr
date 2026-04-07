@@ -1,58 +1,58 @@
 # Gogcli quick commands (v0.9.0)
 
-## Auth and account
-- List stored accounts:
+## 인증과 계정
+- 저장된 계정 목록:
   - `gog auth list`
-- Show auth status and keyring backend:
+- 인증 상태와 키링 백엔드 표시:
   - `gog auth status`
-- Add/authorize an account:
+- 계정 추가/허가:
   - `gog auth add <email>`
-- Use a specific account for any command:
+- 어느 커맨드든 특정 계정 사용:
   - `gog <area> <cmd> --account <email>`
 
-## Output modes
-- Machine-readable TSV:
+## 출력 모드
+- 기계 판독 가능한 TSV:
   - `--plain`
-- JSON output:
+- JSON 출력:
   - `--json`
-- Non-interactive:
-  - `--no-input` (fails instead of prompting)
+- 논인터랙티브:
+  - `--no-input` (프롬프트 대신 실패)
 
 ## Drive
-- List files in a folder (default: root):
+- 폴더内の 파일 목록 (기본: root):
   - `gog drive ls`
-- Search:
+- 검색:
   - `gog drive search "<query>"`
-- Get metadata:
+- 메타데이터:
   - `gog drive get <fileId>`
-- Download (exports Google Docs formats):
+- 다운로드 (Google Docs 포맷으로エクスポート):
   - `gog drive download <fileId>`
-- Permissions:
+- 권한:
   - `gog drive permissions <fileId>`
 
 ## Sheets
-- Spreadsheet metadata:
+- 스프레드시트 메타데이터:
   - `gog sheets metadata <spreadsheetId>`
-- Read a range:
+- 범위 읽기:
   - `gog sheets get <spreadsheetId> <range>`
-- Export:
+- エクスポート:
   - `gog sheets export <spreadsheetId>`
 
 ## Docs
-- Metadata:
+- 메타데이터:
   - `gog docs info <docId>`
-- Export:
+- エクスポート:
   - `gog docs export <docId>`
-- Plain text:
+- 플레인 텍스트:
   - `gog docs cat <docId>`
 
 ## Slides
-- Metadata:
+- 메타데이터:
   - `gog slides info <presentationId>`
-- Export:
+- エクスポート:
   - `gog slides export <presentationId>`
 
-## URL parsing helper (this skill)
-- Extract type and ID:
+## URL 파싱 헬퍼 (이 스킬)
+- 타입과 ID 추출:
   - `python3 scripts/gog_parse_url.py "<url-or-id>"`
-  - Output format: `<type>\t<id>` where type is `sheet|doc|slide|file|folder|id|unknown`
+  - 출력 포맷: `<type>\t<id>` where type is `sheet|doc|slide|file|folder|id|unknown`

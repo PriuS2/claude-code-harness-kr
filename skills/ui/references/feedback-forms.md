@@ -1,6 +1,7 @@
 ---
 name: feedback
 description: "フィードバック収集機能の実装。ユーザーからの声を集めたい場合に使用します。"
+description-ja: "アプリ内フィードバックフォームを実装するスキル。ユーザーからの声を集めたい場合に使用。"
 allowed-tools: ["Read", "Write", "Edit", "Bash"]
 ---
 

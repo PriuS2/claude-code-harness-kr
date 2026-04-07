@@ -1,8 +1,7 @@
 ---
 name: ui
 description: "UIコンポーネントとフィードバックフォームを生成。Use when user mentions components, UI, hero sections, forms, feedback, or contact requests. Do NOT load for: authentication features, backend implementation, database operations, or business logic."
-description-en: "Generates UI components and feedback forms. Use when user mentions components, UI, hero sections, forms, feedback, or contact requests. Do NOT load for: authentication features, backend implementation, database operations, or business logic."
-description-ja: "UIコンポーネントとフィードバックフォームを生成。Use when user mentions components, UI, hero sections, forms, feedback, or contact requests. Do NOT load for: authentication features, backend implementation, database operations, or business logic."
+description-ja: "UIコンポーネントとフィードバックフォームを生成。ユーザーがコンポーネント、UIヒーローセクション、フォーム、フィードバックCONTACTについて言及した場合に使用。認証機能、バックエンド実装、データベース操作、ビジネスロジックには読み込まない。"
 allowed-tools: ["Read", "Write", "Edit", "Bash"]
 user-invocable: false
 ---

@@ -1,24 +1,24 @@
-# Video Generator - 並列シーン生成エンジン
+# Video Generator -並列 씬 生成 엔진
 
-シナリオに基づいて、マルチエージェントで並列にシーンを生成します。
+시나리오에 따라 멀티 에이전트로 병렬에 씬을 생성합니다.
 
 ---
 
-## 概要
+## 개요
 
-`/generate-video` の Step 3 で実行される生成エンジンです。
-planner.md のシナリオを受けて、各シーンを並列で生成し、最終的に統合します。
+`/generate-video` 의 Step 3에서 실행되는 생성 엔진입니다.
+planner.md 의 시나리오를 받아, 각 씬을 병렬로 생성하고 최종적으로統合します。
 
-## 入力
+## 입력
 
-planner.md からのシナリオ:
-- シーンリスト（id, name, duration, template, content）
-- 動画設定（resolution, fps）
+planner.md 로부터의 시나리오:
+- 씬 리스트（id, name, duration, template, content）
+- 영상 설정（resolution, fps）
 
-## 並列生成アーキテクチャ
+##並列 生成 아키텍처
 
 ```
-シナリオ（N シーン）
+시나리오（N 씬）
     │
     ├─[素材生成フェーズ] ← NEW
     │   ├── 各シーンの素材必要判定
@@ -27,50 +27,50 @@ planner.md からのシナリオ:
     │   └── OK → 採用 / NG → 再生成（最大3回）
     │
     ├─[並列数決定]
-    │   └─ min(シーン数, 5) を並列数とする
+    │   └─ min(씬 수, 5) を並列数とする
     │
-    ├─[並列生成フェーズ]
-    │   ├── Agent 1: シーン 1 生成
-    │   ├── Agent 2: シーン 2 生成
-    │   ├── Agent 3: シーン 3 生成
+    ├─[並列 生成フェーズ]
+    │   ├── Agent 1: 씬 1 생성
+    │   ├── Agent 2: 씬 2 생성
+    │   ├── Agent 3: 씬 3 생성
     │   └── ... (max 5 並列)
     │
     ├─[統合フェーズ]
-    │   ├── シーン結合
+    │   ├── 씬 결합
     │   ├── トランジション追加
-    │   └── 音声同期（オプション）
+    │   └── 음성 동기화（선택）
     │
     └─[レンダリングフェーズ]
-        └── 最終出力（mp4/webm/gif）
+        └── 최종 출력（mp4/webm/gif）
 ```
 
 ---
 
-## 素材生成フェーズ（Nano Banana Pro）
+##素材 生成 フェーズ（Nano Banana Pro）
 
-シーン生成前に、必要な素材画像を自動生成します。
+씬 生成前に、必要な素材画像を自動生成します。
 
-### 素材必要判定
+###素材 必要判定
 
-| シーンタイプ | 素材必要 | 理由 |
+| 씬 타입 |素材必要| 이유 |
 |-------------|---------|------|
-| intro | ✅ 必要 | ロゴ、タイトルカード |
-| cta | ✅ 必要 | アクションバナー |
-| architecture | ✅ 必要 | 概念図、ダイアグラム |
-| ui-demo | ❌ 不要 | Playwright キャプチャ使用 |
-| changelog | ❌ 不要 | テキストベース |
+| intro | ✅ 필요 | 로고, 타이틀 카드 |
+| cta | ✅ 필요 | 액션 배너 |
+| architecture | ✅ 필요 | 개념도, 다이어그램 |
+| ui-demo | ❌ 불필요 | Playwright 캡처 사용 |
+| changelog | ❌ 불필요 | 텍스트 기반 |
 
-### 判定ロジック
+###判定 로직
 
 ```javascript
 const needsGeneratedAsset = (scene) => {
-  // 既存素材がある場合はスキップ
+  //既存素材がある場合はスキップ
   if (scene.existingAssets?.length > 0) return false;
 
-  // Playwright キャプチャ対象はスキップ
+  // Playwright 캡처 대상はスキップ
   if (scene.template === 'ui-demo') return false;
 
-  // テキストベースシーンはスキップ
+  // テキストベース 씬はスキップ
   if (scene.template === 'changelog') return false;
 
   // それ以外は生成対象
@@ -78,7 +78,7 @@ const needsGeneratedAsset = (scene) => {
 };
 ```
 
-### 生成フロー
+###生成 플로우
 
 ```
 各シーンに対して:
@@ -89,7 +89,7 @@ const needsGeneratedAsset = (scene) => {
     └── needsGeneratedAsset(scene) = true
         │
         ├── [Step 1] プロンプト生成
-        │   └─ シーン情報 + ブランド情報からプロンプト構築
+        │   └─ 씬 정보 + 브랜드 정보からプロンプト構築
         │
         ├── [Step 2] 画像生成（2枚: 2回リクエスト）
         │   └─ Nano Banana Pro API 呼び出し（generateContent × 2）
@@ -116,35 +116,35 @@ out/
         └── feature-highlight.png
 ```
 
-### シーンへの組み込み
+### 씬への組み込み
 
-生成した画像は、シーン生成エージェントに渡されます:
+生成した画像は、씬 生成エージェントに渡されます:
 
 ```
 Task:
   subagent_type: "video-scene-generator"
   prompt: |
-    シーン情報:
-    - 名前: intro
-    - テンプレート: intro
-    - 生成画像: out/assets/generated/intro.png  ← 追加
+    씬 정보:
+    - 이름: intro
+    - 템플릿: intro
+    - 생성 이미지: out/assets/generated/intro.png  ← 추가
 
     生成画像を背景またはメイン要素として使用してください。
 ```
 
-### 詳細ドキュメント
+### 상세 문서
 
 - [image-generator.md](./image-generator.md) - API 呼び出し、プロンプト設計
-- [image-quality-check.md](./image-quality-check.md) - 品質判定ロジック
+- [image-quality-check.md](./image-quality-check.md) - 品質判定 로직
 
 ---
 
-## 並列数決定ロジック
+##並列 数決定 로직
 
-| シーン数 | 並列数 | 理由 |
-|---------|--------|------|
-| 1-2 | 1-2 | オーバーヘッドが利益を上回る |
-| 3-4 | 3 | 最適なバランス |
+| 씬 수 |並列数| 이유 |
+|---------|--------|-------|
+| 1-2 | 1-2 | 오버헤드가 이익을上回る |
+| 3-4 | 3 | 최적의 균형 |
 | 5+ | 5 | これ以上はリソース競合 |
 
 **実装**:
@@ -154,12 +154,12 @@ const parallelCount = Math.min(scenes.length, 5);
 
 ---
 
-## Task Tool による並列JSON生成
+## Task Tool に 의한並列JSON生成
 
-### 新しい生成フロー（JSON-schema駆動）
+###新しい 生成 플로우（JSON-schema駆動）
 
 ```
-シナリオ（scenario.json）
+시나리오（scenario.json）
     ↓
 ┌─────────────────────────────────────────────┐
 │     Task並列起動（各シーン → JSON出力）      │
@@ -184,7 +184,7 @@ video-script.json（全シーン統合）
 Remotion rendering
 ```
 
-### シーン生成エージェント起動（JSON出力）
+### 씬 生成エージェント起動（JSON出力）
 
 ```
 各シーンに対して Task tool を起動:
@@ -195,34 +195,34 @@ Task:
   prompt: |
     以下のシーンのJSONを scene.schema.json に従って生成してください。
 
-    シーン情報:
+    씬 정보:
     - scene_id: {scene.id}
     - section_id: {section.id}
-    - order: {scene.order} （セクション内の順序）
+    - order: {scene.order} （섹션 내 순서）
     - type: {scene.type}
     - duration_ms: {scene.duration_ms}
     - content: {scene.content}
 
     出力先: out/video-{date}-{id}/scenes/{scene_id}.json
 
-    必須項目:
+    필수 항목:
     - scene_id, section_id, order, type, content
-    - content.duration_ms（音声長 + 余白を考慮）
+    - content.duration_ms（음성 길이 + 여백 고려）
     - direction（transition, emphasis, background, timing）
-    - assets（使用する画像・音声ファイル）
+    - assets（사용하는 이미지·음성 파일）
 
     バリデーション:
     ```bash
     node scripts/validate-scene.js out/video-{date}-{id}/scenes/{scene_id}.json
     ```
 
-    完了報告:
-    - ファイルパス
+    완료 보고:
+    - 파일パス
     - バリデーション結果（PASS/FAIL）
     - 警告があれば報告
 ```
 
-### 進捗モニタリング
+###進捗 モニタリング
 
 ```
 🎬 並列JSON生成中... (3/5 完了)
@@ -234,12 +234,12 @@ Task:
 └── [Agent 5] cta.json 🔜 待機中
 ```
 
-### 結果収集（JSON）
+### 결과 수집（JSON）
 
 ```
 TaskOutput で各エージェントの結果を収集:
 
-結果:
+결과:
   - scene_id: "intro"
     file: "out/video-20260202-001/scenes/intro.json"
     validation: "PASS"
@@ -252,13 +252,13 @@ TaskOutput で各エージェントの結果を収集:
     warnings: ["duration_ms が音声長より短い可能性"]
 ```
 
-### JSON出力仕様
+### JSON出力 仕様
 
 **出力ファイル**: `out/video-{date}-{id}/scenes/{scene_id}.json`
 
 **スキーマ**: `schemas/scene.schema.json`
 
-**必須フィールド**:
+**必須 필드**:
 ```json
 {
   "scene_id": "intro",
@@ -294,7 +294,7 @@ TaskOutput で各エージェントの結果を収集:
 }
 ```
 
-### マージフェーズ
+### マージ フェーズ
 
 全エージェントの完了後、`scripts/merge-scenes.js` を実行:
 
@@ -302,7 +302,7 @@ TaskOutput で各エージェントの結果を収集:
 node scripts/merge-scenes.js out/video-20260202-001/
 ```
 
-**処理内容**:
+**処理 내용**:
 1. `scenes/*.json` を読み込み
 2. `section_id` + `order` でソート
 3. 競合検出（同一 `scene_id` → Critical error）
@@ -329,7 +329,7 @@ node scripts/merge-scenes.js out/video-20260202-001/
 
 ---
 
-## シーン生成テンプレート
+## 씬 生成 テンプレート
 
 ### intro テンプレート
 
@@ -355,7 +355,7 @@ export const IntroScene: React.FC<{
   );
 };
 
-export const DURATION = 150; // 5秒 @ 30fps
+export const DURATION = 150; // 5초 @ 30fps
 ```
 
 ### ui-demo テンプレート（Playwright連携）
@@ -407,16 +407,16 @@ export const CTAScene: React.FC<{
   );
 };
 
-export const DURATION = 150; // 5秒 @ 30fps
+export const DURATION = 150; // 5초 @ 30fps
 ```
 
 ---
 
-## 音声同期ルール（重要）
+## 음성 동기화 규칙（중요）
 
-ナレーション付き動画を生成する際は、以下のルールを厳守すること。
+내레이션이 포함된 영상 생성 시에는以下の 규칙을厳守할 것。
 
-### 1. 音声ファイル長さの事前確認
+### 1. 음성 파일 길이의 사전 확인
 
 ```bash
 # 各音声ファイルの長さを確認
@@ -424,35 +424,35 @@ for f in public/audio/*.wav; do
   name=$(basename "$f" .wav)
   dur=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$f")
   frames=$(echo "$dur * 30" | bc | cut -d. -f1)
-  echo "$name: ${dur}秒 = ${frames}フレーム"
+  echo "$name: ${dur}초 = ${frames}프레임"
 done
 ```
 
-### 2. シーン長さの計算式
+### 2. 씬 길이의 계산식
 
 ```
-シーン長さ = 1秒待機(30f) + 音声長さ + トランジション前余白(20f以上)
+씬 길이 = 1초 대기(30f) + 음성 길이 + 트랜지션 전 여백(20f 이상)
 ```
 
-| 要素 | フレーム数 | 説明 |
+| 요소 | 프레임 수 | 설명 |
 |------|-----------|------|
-| 1秒待機 | 30f | シーン開始後、視覚的に落ち着いてから音声開始 |
-| 音声長さ | 可変 | ffprobe で事前確認 |
-| 余白 | 20f以上 | トランジション開始前に音声終了 |
+| 1초 대기 | 30f | 씬 시작 후, 시각적으로落ち着いた 후 음성 시작 |
+| 음성 길이 | 가변 | ffprobe로 사전 확인 |
+| 여백 | 20f 이상 | 트랜지션 시작 전에 음성 종료 |
 
-### 3. 音声開始タイミング
-
-```
-音声開始 = シーン開始フレーム + 30フレーム（1秒待機）
-```
-
-### 4. シーン開始フレームの計算（TransitionSeries使用時）
+### 3. 음성 시작 타이밍
 
 ```
-シーン開始フレーム = 前シーン開始 + 前シーン長さ - トランジション長さ
+음성 시작 = 씬 시작 프레임 + 30 프레임（1초 대기）
 ```
 
-**例（トランジション15フレームの場合）**:
+### 4. 씬 시작 프레임의 계산（TransitionSeries 사용 시）
+
+```
+씬 시작 프레임 = 이전 씬 시작 + 이전 씬 길이 - 트랜지션 길이
+```
+
+**예시（트랜지션 15 프레임 경우）**:
 ```
 hook:       0
 problem:    175 - 15 = 160
@@ -461,42 +461,42 @@ workPlan:   560 + 340 - 15 = 885
 ...
 ```
 
-### 5. 実装テンプレート
+### 5. 구현 템플릿
 
 ```tsx
 const SCENE_DURATIONS = {
-  hook: 175,      // 30 + 121(音声) + 24(余白)
-  problem: 415,   // 30 + 360(音声) + 25(余白)
-  solution: 340,  // 30 + 286(音声) + 24(余白)
+  hook: 175,      // 30 + 121(음성) + 24(여백)
+  problem: 415,   // 30 + 360(음성) + 25(여백)
+  solution: 340,  // 30 + 286(음성) + 24(여백)
   // ...
 };
 const TRANSITION = 15;
 
-// シーン開始フレーム（累積計算）
+// 씬 시작 프레임（누적 계산）
 // hook:0, problem:160, solution:560, ...
 
 const audioTimings = {
-  hook: 30,       // シーン0 + 30
-  problem: 190,   // シーン160 + 30
-  solution: 590,  // シーン560 + 30
+  hook: 30,       // 씬0 + 30
+  problem: 190,   // 씬160 + 30
+  solution: 590,  // 씬560 + 30
   // ...
 };
 ```
 
-### 6. よくある問題と対策
+### 6. 흔한 문제와対策
 
-| 問題 | 原因 | 対策 |
+| 문제 | 원인 |对策|
 |------|------|------|
-| 音声が被る | 前の音声終了前に次の音声開始 | 音声長さを確認し、シーン長さを調整 |
-| スライド変更と音声がずれる | TransitionSeriesのオーバーラップ未考慮 | シーン開始 = 前シーン開始 + 前シーン長 - トランジション長 |
-| 音声が途中で切れる | シーン長さ < 音声長さ | シーン長さを音声長さ + 余白に調整 |
-| 無音時間が長い | 音声開始が遅すぎる | シーン開始 + 30f で統一 |
+| 음성이 겹침 | 이전 음성 종료 전에 다음 음성 시작 | 음성 길이 확인, 씬 길이 조정 |
+| 슬라이드 변경과 음성이 어긋남 | TransitionSeries의 오버랩 미고려 | 씬 시작 = 이전 씬 시작 + 이전 씬 길이 - 트랜지션 길이 |
+| 음성이 중간에 끊김 | 씬 길이 < 음성 길이 | 씬 길이를 음성 길이 + 여백으로 조정 |
+| 무음 시간이 김 | 음성 시작이 너무 늦음 | 씬 시작 + 30f로 통일 |
 
 ---
 
-## 統合フェーズ
+##統合 フェーズ
 
-### シーン結合
+### 씬 결합
 
 ```tsx
 // remotion/src/FullVideo.tsx
@@ -522,10 +522,10 @@ export const FullVideo: React.FC = () => {
 };
 ```
 
-### トランジション追加
+### 트랜지션 추가
 
 ```tsx
-// トランジションコンポーネント
+// トランジション コンポーネント
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 
@@ -545,101 +545,101 @@ import { fade } from "@remotion/transitions/fade";
 
 ---
 
-## レンダリングフェーズ
+##レンダリング フェーズ
 
-### コマンド実行
+### 명령 실행
 
 ```bash
-# MP4 レンダリング
+# MP4 렌더링
 npx remotion render remotion/index.ts FullVideo out/video.mp4
 
-# GIF レンダリング（短い動画向け）
+# GIF 렌더링（짧은 영상용）
 npx remotion render remotion/index.ts FullVideo out/video.gif
 
-# WebM レンダリング（Web向け）
+# WebM 렌더링（Web용）
 npx remotion render remotion/index.ts FullVideo out/video.webm --codec=vp8
 ```
 
-### 出力オプション
+### 출력 옵션
 
-| フォーマット | 推奨用途 | オプション |
+| 포맷 | 권장 용도 | 옵션 |
 |-------------|---------|-----------|
-| MP4 | 汎用、SNS | `--codec=h264` |
-| WebM | Web埋め込み | `--codec=vp8` |
-| GIF | 短いループ | 15秒以下推奨 |
+| MP4 | 범용, SNS | `--codec=h264` |
+| WebM | Web 임베딩 | `--codec=vp8` |
+| GIF | 짧은 루프 | 15초 이하 권장 |
 
 ---
 
-## 完了報告
+## 완료 보고
 
 ```markdown
-✅ **動画生成完了**
+✅ **영상 生成完了**
 
-📁 **出力ファイル**:
-- `out/video.mp4` (45秒, 1080p, 12.3MB)
+📁 **출력 파일**:
+- `out/video.mp4` (45초, 1080p, 12.3MB)
 
 📊 **生成統計**:
-| 項目 | 値 |
+| 항목 | 값 |
 |------|-----|
-| シーン数 | 4 |
-| 並列エージェント数 | 3 |
-| 生成時間 | 45秒 |
-| レンダリング時間 | 30秒 |
+| 씬 수 | 4 |
+|並列 에이전트 수 | 3 |
+| 생성 시간 | 45초 |
+| 렌더링 시간 | 30초 |
 
-🎬 **プレビュー**:
+🎬 **프리뷰**:
 - Studio: `npm run remotion` → http://localhost:3000
-- ファイル: `open out/video.mp4`
+- 파일: `open out/video.mp4`
 ```
 
 ---
 
 ## エラーハンドリング
 
-### シーン生成失敗
+### 씬 生成 실패
 
 ```
-⚠️ シーン生成エラー
+⚠️ 씬 生成エラー
 
-シーン「auth-demo」の生成に失敗しました。
-原因: Playwright キャプチャ失敗 - アプリが起動していません
+씬「auth-demo」의 生成に失敗しました。
+原因: Playwright 캡처 실패 -  앱이起動していない
 
 対処:
-1. アプリを起動してください: `npm run dev`
+1. 앱을起動してください: `npm run dev`
 2. 再生成: 「auth-demo を再生成」
 3. スキップ: 「このシーンをスキップ」
 ```
 
-### レンダリング失敗
+### 렌더링 실패
 
 ```
-⚠️ レンダリングエラー
+⚠️ 렌더링 エラー
 
 原因: メモリ不足
 
 対処:
-1. 並列数を減らす: `--concurrency 2`
+1.並列数を減らす: `--concurrency 2`
 2. 解像度を下げる: 720p で再試行
-3. シーンを分割: 長いシーンを短く分割
+3. 씬을分割: 긴 씬을短く分割
 ```
 
 ---
 
-## BGM サポート
+## BGM 支持
 
-### 実装方法
+### 구현 방법
 
-コンポジションに `bgmPath` と `bgmVolume` プロパティを追加:
+컴포지션에 `bgmPath` 와 `bgmVolume` プロパティを追加:
 
 ```tsx
 export const VideoComposition: React.FC<{
   enableAudio?: boolean;
   volume?: number;
-  bgmPath?: string;      // BGMファイルパス（staticFile相対）
+  bgmPath?: string;      // BGM 파일パス（staticFile相対）
   bgmVolume?: number;    // BGM音量（0.0-1.0）
 }> = ({ enableAudio = true, volume = 1, bgmPath, bgmVolume = 0.25 }) => {
   return (
     <AbsoluteFill>
-      {/* シーン内容 */}
+      {/* 씬 내용 */}
 
       {/* BGM（ナレーションより控えめに） */}
       {enableAudio && bgmPath && (
@@ -650,24 +650,24 @@ export const VideoComposition: React.FC<{
 };
 ```
 
-### BGM 音量ガイドライン
+### BGM 음량 가이드라인
 
-| ナレーション有無 | 推奨 bgmVolume |
+| 내레이션 여부 | 권장 bgmVolume |
 |-----------------|----------------|
-| あり | 0.20 - 0.30 |
-| なし | 0.50 - 0.80 |
+| 있음 | 0.20 - 0.30 |
+| 없음 | 0.50 - 0.80 |
 
-### 著作権フリー BGM 入手先
+### 저작권 프리 BGM 입수처
 
-- [DOVA-SYNDROME](https://dova-s.jp/) - 日本語、無料
-- [甘茶の音楽工房](https://amachamusic.chagasi.com/) - 日本語、無料
-- [Pixabay Music](https://pixabay.com/music/) - 英語、無料
+- [DOVA-SYNDROME](https://dova-s.jp/) - 일본어, 무료
+- [甘茶の音楽工房](https://amachamusic.chagasi.com/) - 일본어, 무료
+- [Pixabay Music](https://pixabay.com/music/) - 영어, 무료
 
 ---
 
-## 字幕サポート
+## 자막 支持
 
-### 実装方法
+### 구현 방법
 
 ```tsx
 // フォント埋め込み（Base64推奨）
@@ -684,7 +684,7 @@ const FontStyle: React.FC = () => (
   </style>
 );
 
-// 字幕コンポーネント
+// 자막 コンポーネント
 const Subtitle: React.FC<{ text: string }> = ({ text }) => {
   const frame = useCurrentFrame();
   const opacity = interpolate(frame, [0, 10], [0, 1], {
@@ -727,34 +727,34 @@ const Subtitle: React.FC<{ text: string }> = ({ text }) => {
 };
 ```
 
-### 字幕タイミングルール
+### 자막 타이밍 규칙
 
-| 項目 | 値 |
+| 항목 | 값 |
 |------|-----|
-| 字幕開始 | 音声開始と同じタイミング |
-| 字幕duration | 音声長 + 10f（余白） |
+| 자막 시작 | 음성 시작과 동일 타이밍 |
+| 자막 duration | 음성 길이 + 10f（여백）|
 
-### フォント埋め込み（Base64）
+### 폰트 임베딩（Base64）
 
-カスタムフォントを確実に読み込むには Base64 埋め込みを使用:
+커스텀 폰트를 확실히 읽어들이려면 Base64 임베딩 사용:
 
 ```typescript
 // src/utils/custom-font.ts
 import fs from "fs";
 import path from "path";
 
-// ビルド時にBase64エンコード
+// 빌드時にBase64エンコード
 const fontPath = path.join(__dirname, "../../public/font/MyFont.otf");
 const fontBuffer = fs.readFileSync(fontPath);
 export const FONT_DATA_URL = `data:font/otf;base64,${fontBuffer.toString("base64")}`;
 ```
 
-### 字幕データ構造
+### 자막 데이터 구조
 
 ```tsx
 const SUBTITLES = [
-  { id: "hook", text: "字幕テキスト", start: 30, duration: 120 },
-  { id: "problem", text: "次の字幕", start: 175, duration: 178 },
+  { id: "hook", text: "자막 텍스트", start: 30, duration: 120 },
+  { id: "problem", text: "다음 자막", start: 175, duration: 178 },
   // ...
 ];
 
@@ -770,54 +770,54 @@ const SUBTITLES = [
 
 ## Notes
 
-- 並列生成は独立したシーンに対してのみ有効
-- Playwright キャプチャは事前にアプリが起動している必要がある
-- 大きな動画（3分以上）は分割レンダリングを推奨
-- BGMはナレーションが聞こえるよう控えめに設定
-- カスタムフォントはBase64埋め込みで確実に読み込む
+- 병렬 生成は 독립된 씬に対してのみ 유효
+- Playwright 캡처는 사전에 앱이起動している必要がある
+- 큰 영상（3분 이상）은分割レンダ링を推奨
+- BGM은 내레이션이 들리도록控えめに 설정
+- 커스텀 폰트는Base64 임베딩으로 확실히 읽어들이기
 
 ---
 
-## Phase 10: 将来拡張（キャラクター対話動画）
+## Phase 10: 将来的拡張（キャラクター対話 영상）
 
-### 概要
+### 개요
 
-現在の動画生成は**単一ナレーション**形式ですが、将来的に以下のような**キャラクター対話動画**に拡張可能な設計にします：
+현재 영상 生成는 **단일 내레이션**形式ですが、将来的には以下のような**キャラクター対話 영상**に拡張可能な設計にします：
 
-| 現在 | Phase 10 拡張後 |
+| 현재 | Phase 10 확장 후 |
 |------|----------------|
-| 単一ナレーター | 複数キャラクターの対話 |
-| 静的スライド + 音声 | キャラクター表示 + 対話演出 |
-| TTS: 1音声のみ | TTS: キャラクター別音声 |
+| 단일 내레이터 | 복수 캐릭터의 대화 |
+| 정적 슬라이드 + 음성 | 캐릭터 표시 + 대화 연출 |
+| TTS: 1 음성만 | TTS: 캐릭터별 음성 |
 
-### ユースケース例
+### 유즈케이스 예시
 
 ```
-[導入動画の例]
+[導入영상 의 예]
 
-Narrator:  「今日は新機能を紹介します」
-User:      「これは何ができるの？」
+Narrator:  「오늘은 新機能を紹介します」
+User:      「これは何ができますの？」
 AI Guide:  「簡単に説明しましょう」
 ```
 
 ```
-[技術解説動画の例]
+[기술 해설 영상의 예]
 
 Interviewer: 「このアーキテクチャの特徴は？」
 Expert:      「スケーラビリティを重視しています」
 Reviewer:    「具体的な数値を見てみましょう」
 ```
 
-### 拡張ポイント（設計のみ）
+### 확장 포인트（설계のみ）
 
-#### 1. Character 定義（`schemas/character.schema.json`）
+#### 1. Character 정의（`schemas/character.schema.json`）
 
-**既に実装済み**のスキーマで、以下を定義：
+**이미 구현됨**의 스키마로, 이하를 정의:
 
 ```json
 {
   "character_id": "narrator",
-  "name": "ナレーター",
+  "name": "내레이터",
   "role": "narrator",
   "voice": {
     "provider": "google-cloud-tts",
@@ -833,15 +833,15 @@ Reviewer:    「具体的な数値を見てみましょう」
 }
 ```
 
-**拡張項目**:
-- `voice`: TTS設定（プロバイダー、音声ID、スピード、スタイル）
-- `appearance`: ビジュアル設定（アバター、アイコン、位置）
-- `dialogue_style`: 対話演出（吹き出しスタイル、アニメーション）
-- `personality`: 性格特性（将来のAI対話生成用）
+**확장 항목**:
+- `voice`: TTS 설정（프로바이더, 음성 ID, 속도, 스타일）
+- `appearance`: 비주얼 설정（아바타, 아이콘, 위치）
+- `dialogue_style`: 대화 연출（말풍선 스타일, 애니메이션）
+- `personality`: 성격 특성（미래의 AI 대화 생성용）
 
-#### 2. Dialogue シーン定義（将来仕様）
+#### 2. Dialogue 씬 정의（미래 사양）
 
-**dialogue.json** の構造（実装は Phase 10 以降）:
+**dialogue.json** 의 구조（구현은 Phase 10 이후）:
 
 ```json
 {
@@ -852,21 +852,21 @@ Reviewer:    「具体的な数値を見てみましょう」
     "exchanges": [
       {
         "character_id": "user",
-        "text": "この機能は何ができますか？",
+        "text": "이 기능은 무엇을 할 수 있나요?",
         "timing_ms": 0,
         "duration_ms": 3000,
         "emotion": "curious"
       },
       {
         "character_id": "guide",
-        "text": "簡単に説明します。まず...",
+        "text": "간단히 설명합니다. 먼저...",
         "timing_ms": 3500,
         "duration_ms": 5000,
         "emotion": "friendly"
       },
       {
         "character_id": "narrator",
-        "text": "実際の画面を見てみましょう",
+        "text": "실제 화면을 봅시다",
         "timing_ms": 9000,
         "duration_ms": 3000,
         "emotion": "neutral"
@@ -891,23 +891,23 @@ Reviewer:    「具体的な数値を見てみましょう」
 }
 ```
 
-#### 3. TTS 連携の拡張方法
+#### 3. TTS 연계의 확장 방법
 
-**現在（単一音声）**:
+**현재（단일 음성）**:
 ```javascript
 // 1つの音声ファイルを再生
 <Audio src={staticFile('narration.wav')} />
 ```
 
-**Phase 10 拡張後（キャラクター別音声）**:
+**Phase 10 확장 후（캐릭터별 음성）**:
 ```javascript
-// キャラクター別にTTS呼び出し
+// 캐릭터별로 TTS 호출
 async function generateDialogue(exchanges, characters) {
   const audioFiles = await Promise.all(
     exchanges.map(async (exchange) => {
       const character = characters.find(c => c.character_id === exchange.character_id);
 
-      // TTS APIを呼び出し（プロバイダーに応じて分岐）
+      // TTS API 호출（프로바이더에 따라 분기）
       const audioBuffer = await ttsProvider.synthesize({
         text: exchange.text,
         voiceId: character.voice.voice_id,
@@ -928,21 +928,21 @@ async function generateDialogue(exchanges, characters) {
 }
 ```
 
-**TTS プロバイダー連携**:
+**TTS 프로바이더 연계**:
 
-| プロバイダー | API 呼び出し例 |
+| 프로바이더 | API 호출 예 |
 |-------------|---------------|
 | Google Cloud TTS | `textToSpeech.synthesizeSpeech({ voice, input })` |
 | ElevenLabs | `elevenlabs.textToSpeech({ voiceId, text })` |
 | OpenAI TTS | `openai.audio.speech.create({ voice, input })` |
 | AWS Polly | `polly.synthesizeSpeech({ VoiceId, Text })` |
 
-#### 4. ビジュアル演出の拡張
+#### 4. 비주얼 연출의 확장
 
-**キャラクター表示（Remotion コンポーネント例）**:
+**캐릭터 표시（Remotion 컴포넌트 예）**:
 
 ```tsx
-// 将来実装: DialogueScene.tsx
+// 将来的実装: DialogueScene.tsx
 const DialogueScene: React.FC<{
   exchanges: Exchange[];
   characters: Character[];
@@ -951,21 +951,21 @@ const DialogueScene: React.FC<{
 
   return (
     <AbsoluteFill>
-      {/* 背景 */}
+      {/* 배경 */}
       <Background />
 
-      {/* キャラクター表示 */}
+      {/* 캐릭터 표시 */}
       <CharacterDisplay
         characters={characters}
         activeCharacterId={getCurrentSpeaker(frame, exchanges)}
       />
 
-      {/* 対話テキスト（吹き出し） */}
+      {/* 대화 텍스트（말풍선） */}
       <DialogueBubble
         exchange={getCurrentExchange(frame, exchanges)}
       />
 
-      {/* 音声再生 */}
+      {/* 음성 재생 */}
       {exchanges.map((ex, i) => (
         <Sequence from={ex.timing_ms / 33.33} durationInFrames={ex.duration_ms / 33.33}>
           <Audio src={staticFile(`dialogue/${ex.character_id}_${i}.wav`)} />
@@ -976,38 +976,38 @@ const DialogueScene: React.FC<{
 };
 ```
 
-**アニメーション例**:
-- 話している キャラクターをハイライト
-- 話していないキャラクターは半透明
-- 吹き出しがフェードイン/アウト
-- キャラクターアバターが口パク（オプション）
+**애니메이션 예**:
+- 话している 캐릭터를ハイライト
+- 话していない 캐릭터는 반투명
+-  말풍선이 페이드인/아웃
+- 캐릭터 아바타가 口パク（선택）
 
-#### 5. 実装ロードマップ（Phase 10 以降）
+#### 5. 구현 로드맵（Phase 10 이후）
 
-| Phase | 実装内容 | 優先度 |
+| Phase | 구현 내용 | 우선순위 |
 |-------|---------|--------|
-| **Phase 10.1** | `character.schema.json` 実装 | ✅ 完了 |
-| **Phase 10.2** | TTS プロバイダー連携（Google Cloud TTS） | High |
-| **Phase 10.3** | `DialogueScene` Remotion コンポーネント | High |
-| **Phase 10.4** | `dialogue.json` スキーマ定義 | Medium |
-| **Phase 10.5** | キャラクター表示 UI（アバター/アイコン） | Medium |
-| **Phase 10.6** | 吹き出しアニメーション | Low |
-| **Phase 10.7** | 複数 TTS プロバイダー対応（ElevenLabs, OpenAI） | Low |
-| **Phase 10.8** | AI 対話生成（personality に基づく自動生成） | Future |
+| **Phase 10.1** | `character.schema.json` 구현 | ✅ 완료 |
+| **Phase 10.2** | TTS 프로바이더 연계（Google Cloud TTS）| High |
+| **Phase 10.3** | `DialogueScene` Remotion 컴포넌트 | High |
+| **Phase 10.4** | `dialogue.json` 스키마 정의 | Medium |
+| **Phase 10.5** | 캐릭터 표시 UI（아바타/아이콘）| Medium |
+| **Phase 10.6** | 말풍선 애니메이션 | Low |
+| **Phase 10.7** | 복수 TTS 프로바이더 대응（ElevenLabs, OpenAI）| Low |
+| **Phase 10.8** | AI 대화 생성（personality 에 따른 자동 생성）| Future |
 
-#### 6. 互換性の維持
+#### 6. 호환성의 유지
 
-拡張は**後方互換性を保つ**設計：
+확장은 **하위 호환성을保つ** 설계:
 
 ```
-既存の video-script.json（単一ナレーション）
-    ↓ そのまま動作
-新しい dialogue.json（対話形式）
-    ↓ 新しいシーンタイプとして追加
-両方が共存可能
+기존 video-script.json（단일 내레이션）
+    ↓ 그대로 동작
+새 dialogue.json（대화 형식）
+    ↓ 새로운 씬 타입으로 추가
+양자 共存 가능
 ```
 
-**scene.schema.json への追加**:
+**scene.schema.jsonへの追加**:
 ```json
 {
   "type": {
@@ -1023,37 +1023,37 @@ const DialogueScene: React.FC<{
 
 #### 7. 参考実装
 
-既存プロジェクトの例:
-- **Manim Community**: キャラクターアニメーション
-- **Remotion Templates**: 対話形式テンプレート
-- **Google Cloud TTS**: 多言語・多音声対応
+기존 프로젝트의 예:
+- **Manim Community**: 캐릭터 애니메이션
+- **Remotion Templates**: 대화 형식 템플릿
+- **Google Cloud TTS**: 다국어·다음성 대응
 
 ---
 
-### Phase 10 実装時のチェックリスト
+### Phase 10実装時のチェックリスト
 
 将来実装する際は以下を確認：
 
-- [ ] `character.schema.json` が有効（既に Phase 10.1 で完了）
-- [ ] TTS API キーが設定済み（Google Cloud TTS 推奨）
-- [ ] `dialogue.json` スキーマを定義
-- [ ] `DialogueScene.tsx` Remotion コンポーネント実装
-- [ ] キャラクター音声ファイルの命名規則統一
-- [ ] 吹き出しスタイルのブランド一貫性
-- [ ] 既存シーン（intro, ui-demo 等）との共存テスト
-- [ ] パフォーマンス: 複数音声の同時レンダリング最適化
+- [ ] `character.schema.json` が有効（이미 Phase 10.1 로 완료）
+- [ ] TTS API 키가 설정됨（Google Cloud TTS 권장）
+- [ ] `dialogue.json` 스키마를 정의
+- [ ] `DialogueScene.tsx` Remotion 컴포넌트 구현
+- [ ] 캐릭터 음성 파일의 명명 규칙 통일
+- [ ] 말풍선 스타일의 브랜드 일관성
+- [ ] 기존 씬（intro, ui-demo 등）との共存 테스트
+- [ ] 性能: 복수 음성의 동시 렌더링 최적화
 
 ---
 
-### まとめ（Phase 10）
+### 정리（Phase 10）
 
-**現状**: 単一ナレーション動画に対応
-**Phase 10 設計**: キャラクター対話動画への拡張ポイントを明確化
-**実装済み**: `character.schema.json`（キャラクター定義）
-**未実装**: TTS連携、対話シーン、ビジュアル演出（将来実装）
+**현황**: 단일 내레이션 영상에 대응
+**Phase 10 설계**: 캐릭터 대화 영상으로의 확장 포인트明確化
+**이미 구현됨**: `character.schema.json`（캐릭터 정의）
+**미구현**: TTS 연계, 대화 씬, 비주얼 연출（미래 구현）
 
-この設計により、将来的に以下が可能になります：
-- 複数キャラクターの対話形式動画
-- キャラクター別の音声スタイル
-- 視覚的なキャラクター表示と対話演出
-- AI による対話生成（personality 設定に基づく）
+이 설계에 의해, 장래적으로以下が可能になります：
+- 복수 캐릭터의 대화 형식 영상
+- 캐릭터별 음성 스타일
+- 시각적 캐릭터 표시와 대화 연출
+- AI 에 의한 대화 생성（personality 설정에 따른）

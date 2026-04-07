@@ -1,37 +1,37 @@
 ---
 name: cc-cursor-cc
-description: "Cursor PM でアイデアを検証し Plans.md を更新してバトンタッチ。Cursor ↔ Claude Code 2-Agent ワークフロー対応。Use when user mentions Cursor PM handoff, 2-agent plan validation, CC-Cursor round trip, or brainstorm review. Do NOT load for: implementation work, single-agent tasks, or direct coding."
-description-en: "Validates brainstormed ideas with Cursor PM, updates Plans.md, then handoff back. Cursor ↔ Claude Code 2-Agent workflow support. Use when user mentions Cursor PM handoff, 2-agent plan validation, CC-Cursor round trip, or brainstorm review. Do NOT load for: implementation work, single-agent tasks, or direct coding."
-description-ja: "Cursor PM でアイデアを検証し Plans.md を更新してバトンタッチ。Cursor ↔ Claude Code 2-Agent ワークフロー対応。Use when user mentions Cursor PM handoff, 2-agent plan validation, CC-Cursor round trip, or brainstorm review. Do NOT load for: implementation work, single-agent tasks, or direct coding."
+description: "Cursor PM으로 아이디어를 검증하고 Plans.md를 업데이트하여バトンタッチ。Cursor ↔ Claude Code 2-Agent 워크플로우 지원。Use when user mentions Cursor PM handoff, 2-agent plan validation, CC-Cursor round trip, or brainstorm review. Do NOT load for: implementation work, single-agent tasks, or direct coding."
+description-en: "Validates brainstormed ideas with Cursor PM, updates Plans.md, then handoff back. Cursor ↔ Claude Code 2-Agent workflow support."
+description-ja: "Cursor PMでアイデアを検証し Plans.md を更新してバトンタッチ。Cursor ↔ Claude Code 2-Agent ワークフロー対応。"
 allowed-tools: ["Read", "Write", "Edit", "Bash"]
 user-invocable: false
 ---
 
 # CC-Cursor-CC Skill (Plan Validation Round Trip)
 
-Supports the flow of sending brainstormed content from Claude Code to **Cursor (PM)** for feasibility validation.
+**Cursor (PM)**로 브레인스토밍 내용을 전송하여 실현 가능성 검증을 지원하는 스킬.
 
 ## Prerequisites
 
-This skill assumes **2-agent operation**.
+이 스킬은 **2-agent 작업**을 전제로 합니다.
 
-| Role | Agent | Description |
-|------|-------|-------------|
-| **PM** | Cursor | Validate plans, update Plans.md |
-| **Impl** | Claude Code | Brainstorming, implementation |
+| Role | Agent | 설명 |
+|------|-------|------|
+| **PM** | Cursor | plans 검증, Plans.md 업데이트 |
+| **Impl** | Claude Code | 브레인스토밍, 구현 |
 
-## Execution Flow
+## 실행 흐름
 
-### Step 1: Extract Brainstorming Context
+### Step 1: 브레인스토밍 컨텍스트 추출
 
-Extract from recent conversation:
-1. **Goal** (feature/purpose)
-2. **Technology choices**
-3. **Decisions made**
-4. **Undecided items**
-5. **Concerns**
+최근 대화에서 다음을 추출:
+1. **목표** (feature/purpose)
+2. **기술 선택**
+3. **결정 사항**
+4. **미결정 항목**
+5. **우려 사항**
 
-### Step 2: Add Provisional Tasks to Plans.md
+### Step 2: Plans.md에 임시 작업 추가
 
 ```markdown
 ## 🟠 Under Validation: {{Project}} `pm:awaiting-validation`
@@ -44,9 +44,9 @@ Extract from recent conversation:
 - {{item1}} → **Requesting PM decision**
 ```
 
-### Step 3: Generate Validation Request for Cursor
+### Step 3: Cursor용 검증 요청 생성
 
-Generate text to copy-paste to Cursor:
+복사하여 Cursor에 붙여넣을 텍스트 생성:
 
 ```markdown
 ## 📋 Plan Validation Request
@@ -64,15 +64,15 @@ Generate text to copy-paste to Cursor:
 4. Update Plans.md (awaiting → cc:TODO)
 ```
 
-### Step 4: Guide Next Action
+### Step 4: 다음 행동 안내
 
-1. Copy & paste request to **Cursor**
-2. Run `/plan-with-cc` in Cursor
-3. Cursor updates Plans.md
-4. Cursor runs `/handoff-to-claude`
-5. Copy & paste back to **Claude Code**
+1. 요청을 **Cursor**에 복사 & 붙여넣기
+2. Cursor에서 `/plan-with-cc` 실행
+3. Cursor가 Plans.md 업데이트
+4. Cursor가 `/handoff-to-claude` 실행
+5. **Claude Code**에 다시 복사 & 붙여넣기
 
-## Overall Flow
+## 전체 흐름
 
 ```
 Claude Code (Brainstorm)

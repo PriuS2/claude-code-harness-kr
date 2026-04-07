@@ -1,33 +1,33 @@
-# Naming Conventions for Video Generation Schemas
+# Naming Conventions for Video Generation Schemas - 영상 생성 스키마 명명 규칙
 
-This document defines the unified naming conventions for all JSON schemas in the video generation system.
+이 문서는 영상 생성 시스템의 모든 JSON 스키마에 대한 통합 명명 규칙을 정의합니다.
 
 ## Version
 **1.0.0** - 2026-02-03
 
 ---
 
-## 1. Time Units
+## 1. 시간 단위
 
-### Rule
-**All time durations MUST use milliseconds (`_ms` suffix)**
+### 규칙
+**모든 시간 지속 시간은 반드시 밀리초（`_ms` 접미사）를 사용해야 합니다**
 
-### Rationale
-- Milliseconds provide sufficient precision for video timing
-- Frame counts are FPS-dependent and should be calculated at runtime
-- Consistency across all schemas
+### 이유
+- 밀리초는 영상 타이밍에 충분한 정밀도를 제공합니다
+- 프레임 카운트는 FPS에 따라 다르며 런타임에 계산해야 합니다
+- 모든 스키마에서 일관성 확보
 
-### Examples
+### 예시
 
 ```json
-// ✅ Correct
+// ✅ 올바름
 {
   "duration_ms": 5000,
   "start_offset_ms": 1000,
   "fade_in_ms": 500
 }
 
-// ❌ Incorrect
+// ❌ 올바르지 않음
 {
   "duration_frames": 150,
   "duration": 5,
@@ -35,9 +35,9 @@ This document defines the unified naming conventions for all JSON schemas in the
 }
 ```
 
-### Conversion at Runtime
+### 런타임시의 변환
 ```javascript
-// FPS is provided in output_settings
+// FPS는 output_settings에서 제공됨
 const fps = 30;
 const durationMs = 5000;
 const durationFrames = Math.floor((durationMs / 1000) * fps); // 150 frames
@@ -45,29 +45,29 @@ const durationFrames = Math.floor((durationMs / 1000) * fps); // 150 frames
 
 ---
 
-## 2. Transition Types
+## 2. Transition 타입
 
-### Rule
-**Transition enums MUST use snake_case values**
+### 규칙
+**Transition 열거형은 반드시 snake_case 값을 사용해야 합니다**
 
-### Standard Enum
+### 표준 열거형
 ```json
 {
   "enum": ["fade", "slide_in", "zoom", "cut"]
 }
 ```
 
-### Definitions
+### 정의
 
-| Value | Description | Use Case |
+| 값 | 설명 | 사용 상황 |
 |-------|-------------|----------|
-| `fade` | Gradual opacity change | Default, subtle transitions |
-| `slide_in` | Slide from direction | Dynamic scene changes |
-| `zoom` | Scale in/out | Emphasis, dramatic reveals |
-| `cut` | Instant cut (no transition) | Fast-paced content |
+| `fade` | 점진적 불투명도 변경 | 기본, 은은한 전환 |
+| `slide_in` | 방향에서 슬라이드 | 역동적인 씬 변경 |
+| `zoom` | 확대/축소 | 강조, 드라마틱한 공개 |
+| `cut` | 즉각 컷 (전환 없음) | 빠른 전개 콘텐츠 |
 
-### Direction Property (for slide_in)
-When `transition.type === "slide_in"`, use the `direction` property:
+### Direction 속성（slide_in 의 경우）
+`transition.type === "slide_in"` 인 경우, `direction` 속성을 사용합니다:
 
 ```json
 {
@@ -79,24 +79,24 @@ When `transition.type === "slide_in"`, use the `direction` property:
 }
 ```
 
-**Valid directions**: `"left"`, `"right"`, `"top"`, `"bottom"`
+**유효한 방향**: `"left"`, `"right"`, `"top"`, `"bottom"`
 
 ---
 
-## 3. Property Naming Case
+## 3. 속성 명명 케이스
 
-### Rule
-**All property names MUST use snake_case**
+### 규칙
+**모든 속성 이름은 반드시 snake_case를 사용해야 합니다**
 
-### Rationale
-- Consistency with existing codebase conventions
-- Better readability for multi-word properties
-- Alignment with JSON Schema best practices
+### 이유
+- 기존 코드베이스 규칙과의 일관성
+- 복합어 속성의 가독성 향상
+- JSON Schema 모범 사례와의 정렬
 
-### Examples
+### 예시
 
 ```json
-// ✅ Correct
+// ✅ 올바름
 {
   "primary_color": "#3B82F6",
   "secondary_color": "#10B981",
@@ -107,7 +107,7 @@ When `transition.type === "slide_in"`, use the `direction` property:
   "glow_intensity": 20
 }
 
-// ❌ Incorrect
+// ❌ 올바르지 않음
 {
   "primaryColor": "#3B82F6",
   "fontSize": 48,
@@ -118,56 +118,56 @@ When `transition.type === "slide_in"`, use the `direction` property:
 
 ---
 
-## 4. Enum Values
+## 4. 열거형 값
 
-### Rule
-**Enum values MUST use lowercase with hyphens for multi-word values**
+### 규칙
+**열거형 값은 복합어의 경우 소문자와 하이픈을 사용해야 합니다**
 
-### Standard Patterns
+### 표준 패턴
 
-#### Scene Types
+#### 씬 타입
 ```json
 ["intro", "ui-demo", "architecture", "code-highlight", "changelog", "cta"]
 ```
 
-#### Visual Styles
+#### 시각 스타일
 ```json
 ["minimalist", "technical", "modern", "gradient", "flat", "3d"]
 ```
 
-#### Animation Easing
+#### 애니메이션 이징
 ```json
 ["linear", "ease-in", "ease-out", "ease-in-out", "ease-in-quad", "ease-out-quad"]
 ```
 
-#### Background Types
+#### 배경 타입
 ```json
 ["cyberpunk", "corporate", "minimal", "gradient", "particles"]
 ```
 
 ---
 
-## 5. ID Patterns
+## 5. ID 패턴
 
-### Rule
-**IDs MUST use kebab-case (lowercase with hyphens)**
+### 규칙
+**ID는 반드시 kebab-case（小文字とハイフォン）를 사용해야 합니다**
 
-### Pattern
+### 패턴
 ```regex
 ^[a-z0-9-]+$
 ```
 
-### Examples
+### 예시
 
 ```json
-// ✅ Correct
+// ✅ 올바름
 {
   "scene_id": "intro-hero",
   "section_id": "feature-highlights",
   "character_id": "expert-reviewer"
 }
 
-// ❌ Incorrect
+// ❌ 올바르지 않음
 {
   "scene_id": "introHero",
   "section_id": "feature_highlights",
@@ -177,35 +177,35 @@ When `transition.type === "slide_in"`, use the `direction` property:
 
 ---
 
-## 6. Color Format
+## 6. 색상 형식
 
-### Rule
-**Colors MUST use uppercase HEX format with `#` prefix**
+### 규칙
+**색상은 반드시 `#` 접두사와 함께 대문자 HEX 형식을 사용해야 합니다**
 
-### Pattern
+### 패턴
 ```regex
 ^#[0-9A-F]{6}$
 ```
 
-### Examples
+### 예시
 
 ```json
-// ✅ Correct
+// ✅ 올바름
 {
   "primary_color": "#3B82F6",
   "accent_color": "#F59E0B"
 }
 
-// ❌ Incorrect
+// ❌ 올바르지 않음
 {
-  "primary_color": "#3b82f6",  // lowercase
-  "accent_color": "3B82F6",    // missing #
-  "text_color": "rgb(59, 130, 246)"  // not HEX
+  "primary_color": "#3b82f6",  // 소문자
+  "accent_color": "3B82F6",    // # 누락
+  "text_color": "rgb(59, 130, 246)"  // HEX 아님
 }
 ```
 
-### RGBA Exception
-For transparency, use `rgba()` format:
+### RGBA 예외
+투명도의 경우 `rgba()` 형식을 사용합니다:
 
 ```json
 {
@@ -215,31 +215,31 @@ For transparency, use `rgba()` format:
 
 ---
 
-## 7. Reserved Keywords
+## 7. 예약 키워드
 
-### Audio Properties
-- `fade_in_ms` / `fade_out_ms` - Audio fade durations
-- `start_offset_ms` - Delay before audio/narration starts
-- `master_volume` - Global volume (0.0 - 1.0)
+### 음성 속성
+- `fade_in_ms` / `fade_out_ms` - 음성 페이드 시간
+- `start_offset_ms` - 음성/내레이션 시작 전 지연
+- `master_volume` -全局 볼륨（0.0 - 1.0）
 
-### Visual Properties
-- `duration_ms` - Duration in milliseconds
-- `transition` - Transition configuration object
-- `emphasis` - Emphasis/highlighting configuration
-- `background` - Background configuration
+### 시각 속성
+- `duration_ms` - 밀리초 단위 지속 시간
+- `transition` - 전환 구성 객체
+- `emphasis` - 강조/하이라이트 구성
+- `background` - 배경 구성
 
-### Metadata Properties
-- `created_at` / `updated_at` - ISO 8601 timestamps
-- `version` - Semantic version (e.g., "1.0.0")
-- `description` - Human-readable description
+### 메타데이터 속성
+- `created_at` / `updated_at` - ISO 8601 타임스탬프
+- `version` - 시맨틱 버전（예: "1.0.0"）
+- `description` - 사람이 읽을 수 있는 설명
 
 ---
 
-## 8. Migration Guide
+## 8. 마이그레이션 가이드
 
-### From `duration_frames` to `duration_ms`
+### `duration_frames` 에서 `duration_ms` 로
 
-**Before:**
+**이전:**
 ```json
 {
   "transition": {
@@ -249,7 +249,7 @@ For transparency, use `rgba()` format:
 }
 ```
 
-**After:**
+**이후:**
 ```json
 {
   "transition": {
@@ -259,14 +259,14 @@ For transparency, use `rgba()` format:
 }
 ```
 
-**Conversion formula** (assuming 30 FPS):
+**변환 공식** (30 FPS 가정):
 ```
 duration_ms = (duration_frames / 30) * 1000
 ```
 
-### From `slideIn` to `slide_in`
+### `slideIn` 에서 `slide_in` 로
 
-**Before:**
+**이전:**
 ```json
 {
   "transition": {
@@ -276,7 +276,7 @@ duration_ms = (duration_frames / 30) * 1000
 }
 ```
 
-**After:**
+**이후:**
 ```json
 {
   "transition": {
@@ -287,9 +287,9 @@ duration_ms = (duration_frames / 30) * 1000
 }
 ```
 
-### From camelCase to snake_case
+### camelCase에서 snake_case로
 
-**Before:**
+**이전:**
 ```json
 {
   "background": {
@@ -299,7 +299,7 @@ duration_ms = (duration_frames / 30) * 1000
 }
 ```
 
-**After:**
+**이후:**
 ```json
 {
   "background": {
@@ -311,31 +311,31 @@ duration_ms = (duration_frames / 30) * 1000
 
 ---
 
-## 9. Schema Validation
+## 9. 스키마 검증
 
-All schemas MUST validate against these conventions:
+모든 스키마는以下の 규칙 대해 검증해야 합니다:
 
-### Checklist
-- [ ] No `duration_frames` properties (use `duration_ms`)
-- [ ] Transition enums: `["fade", "slide_in", "zoom", "cut"]`
-- [ ] All properties use `snake_case`
-- [ ] All enum values use `lowercase-with-hyphens`
-- [ ] All IDs match pattern `^[a-z0-9-]+$`
-- [ ] All HEX colors match pattern `^#[0-9A-F]{6}$`
-
----
-
-## 10. Exceptions
-
-### Character Schema (Phase 10+)
-The `character.schema.json` may retain some camelCase properties for compatibility with TTS provider APIs (e.g., `overshootClamping` for spring animations).
-
-### External APIs
-When interfacing with external APIs (Remotion, TTS providers), conversion layers should handle naming differences.
+### 체크리스트
+- [ ] `duration_frames` 속성 없음（`duration_ms` 사용）
+- [ ] 트랜지션 열거형: `["fade", "slide_in", "zoom", "cut"]`
+- [ ] 모든 속성이 `snake_case` 사용
+- [ ] 모든 열거형 값이 `소문자-하이픈` 사용
+- [ ] 모든 ID가 패턴 `^[a-z0-9-]+$` 일치
+- [ ] 모든 HEX 색상이 패턴 `^#[0-9A-F]{6}$` 일치
 
 ---
 
-## Related Documentation
+## 10. 예외
+
+### Character 스키마 (Phase 10+)
+`character.schema.json` 은 TTS 프로바이더 API（예: spring 애니메이션의 `overshootClamping`）와의 호환성을 위해 일부 camelCase 속성을 유지할 수 있습니다.
+
+### 외부 API
+외부 API（Remotion, TTS 프로바이더）와 인터페이스할 때, 명명 차이를 처리하는 변환 레이어가 있어야 합니다.
+
+---
+
+## 관련 문서
 
 - [Schema Phase Plan](../PLANS.md) - Phase 11.2: Naming & Unit Standardization
 - [Animation Schema](../schemas/animation.schema.json)

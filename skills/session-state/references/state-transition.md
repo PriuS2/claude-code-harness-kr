@@ -1,6 +1,7 @@
 ---
 name: state-transition
 description: "Execute session state transitions using session-state.sh"
+description-ja: "session-state.shを使用してセッション状態遷移を実行する。"
 allowed-tools: [Read, Bash]
 ---
 

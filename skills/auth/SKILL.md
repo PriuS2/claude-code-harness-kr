@@ -1,73 +1,73 @@
 ---
 name: auth
-description: "認証と決済機能を実装。Clerk、Supabase Auth、Stripeに対応。Use when user mentions login, authentication, payments, subscriptions, or Stripe. Do NOT load for: general UI work, database design, or non-auth features."
+description: "인증과 결제 기능을 구현합니다. Clerk, Supabase Auth, Stripeに対応。Use when user mentions login, authentication, payments, subscriptions, or Stripe. Do NOT load for: general UI work, database design, or non-auth features."
 description-en: "Implements authentication and payment features using Clerk, Supabase Auth, or Stripe. Use when user mentions login, authentication, payments, subscriptions, or Stripe. Do NOT load for: general UI work, database design, or non-auth features."
-description-ja: "認証と決済機能を実装。Clerk、Supabase Auth、Stripeに対応。Use when user mentions login, authentication, payments, subscriptions, or Stripe. Do NOT load for: general UI work, database design, or non-auth features."
+description-ja: "인증과 결제 기능을 구현합니다. Clerk, Supabase Auth, Stripeに対応。Use when user mentions login, authentication, payments, subscriptions, or Stripe. Do NOT load for: general UI work, database design, or non-auth features."
 allowed-tools: ["Read", "Write", "Edit", "Bash"]
 user-invocable: false
 ---
 
 # Auth Skills
 
-認証と決済機能の実装を担当するスキル群です。
+인증과 결제 기능의 실장을 담당하는 스킬 그룹입니다.
 
-## 機能詳細
+## 기능 상세
 
-| 機能 | 詳細 |
+| 기능 | 상세 |
 |------|------|
-| **認証機能** | See [references/authentication.md](${CLAUDE_SKILL_DIR}/references/authentication.md) |
-| **決済機能** | See [references/payments.md](${CLAUDE_SKILL_DIR}/references/payments.md) |
+| **인증 기능** | See [references/authentication.md](${CLAUDE_SKILL_DIR}/references/authentication.md) |
+| **결제 기능** | See [references/payments.md](${CLAUDE_SKILL_DIR}/references/payments.md) |
 
-## 実行手順
+## 실행 절차
 
-1. **品質判定ゲート**（Step 0）
-2. ユーザーのリクエストを分類(認証 or 決済)
-3. 上記の「機能詳細」から適切な参照ファイルを読む
-4. その内容に従って実装
+1. **품질 판단 게이트** (Step 0)
+2. 사용자의 요청을 분류 (인증 or 결제)
+3. 위의 "기능 상세"에서 적절한 참조 파일을 읽음
+4. 그 내용에 따라 실장
 
-### Step 0: 品質判定ゲート（セキュリティチェックリスト）
+### Step 0: 품질 판단 게이트 (보안 체크리스트)
 
-認証・決済機能は常にセキュリティリスクが高いため、作業開始前に必ず以下を表示:
+인증・결제 기능은 항상 보안 위험이 높으므로, 작업 시작전에 반드시以下を표시:
 
 ```markdown
-🔐 セキュリティチェックリスト
+🔐 보안 체크리스트
 
-この作業はセキュリティ上重要です。以下を確認してください：
+이 작업은 보안상 중요합니다. 이하를 확인해주세요:
 
-### 認証関連
-- [ ] パスワードはハッシュ化（bcrypt/argon2）
-- [ ] セッション管理は安全か（HTTPOnly Cookie）
-- [ ] CSRF 対策は実装されているか
-- [ ] レート制限（ブルートフォース対策）
+### 인증 관련
+- [ ] 비밀번호는 해시화 (bcrypt/argon2)
+- [ ] 세션 관리는 안전한지 (HTTPOnly Cookie)
+- [ ] CSRF 대응은 구현되어 있는지
+- [ ] 레이트 리밋 (브루트포스 방지)
 
-### 決済関連
-- [ ] 機密情報（カード番号等）をサーバーに保存しない
-- [ ] Stripe/決済プロバイダの SDK を正しく使用
-- [ ] Webhook の署名検証
-- [ ] 金額改ざん防止（サーバー側で金額を確定）
+### 결제 관련
+- [ ] 기밀 정보 (카드 번호 등) 를 서버에 저장하지 않음
+- [ ] Stripe/결제 프로바이더의 SDK를 올바르게 사용
+- [ ] Webhook의 서명 검증
+- [ ] 금액 변조 방지 (서버 측에서 금액을 확정)
 
-### 共通
-- [ ] エラーメッセージが詳細すぎないか（情報漏洩防止）
-- [ ] ログに機密情報を出力していないか
+### 공통
+- [ ] 에러 메시지가 너무 자세하지 않은지 (정보 유출 방지)
+- [ ] 로그에 기밀 정보를 출력하지 않는지
 ```
 
-### セキュリティ重要度表示
+### 보안 중요도 표시
 
 ```markdown
-⚠️ 注意レベル: 🔴 高
+⚠️ 주의 레벨: 🔴 高
 
-この機能は以下のリスクがあります：
-- 認証情報の漏洩
-- 不正アクセス
-- 決済の不正操作
+이 기능は以下のリスクがあります：
+- 인증 정보의 유출
+- 부정한 접근
+- 결제의 부정한 조작
 
-専門家によるレビューを推奨します。
+전문가による 검토를 권장합니다.
 ```
 
 ### VibeCoder 向け
 
 ```markdown
-🔐 安全にログイン・決済機能を作るために
+🔐安全にログイン・決済機能を作るために
 
 1. **パスワードは「ハッシュ化」する**
    - 元のパスワードを復元できない形で保存

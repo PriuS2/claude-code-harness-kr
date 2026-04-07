@@ -1,12 +1,12 @@
-# Asset Customization Guide
+# Asset Customization Guide - 에셋 사용자 정의 가이드
 
-ユーザーカスタムアセット（背景、効果音、フォント、画像）の上書き方法とベストプラクティス。
+사용자 정의 에셋（배경, 효과음, 폰트, 이미지）의 오버라이드 방법과 베스트 프랙티스.
 
 ---
 
-## 概要
+## 개요
 
-動画生成で使用するアセットは以下の優先順位で読み込まれます：
+영상 생성에서 사용하는 에셋は、以下の優先順位で読み込まれます：
 
 ```
 1. ユーザーアセット (~/.harness/video/assets/)    ← 最優先
@@ -14,26 +14,26 @@
 3. ビルトインデフォルト (ハードコード)              ← 最終手段
 ```
 
-この仕組みにより、スキル本体を変更せずに自分好みのアセットを使用できます。
+이 메커니즘을 통해 스킬 본체를 변경하지 않고 자신만의 에셋을 사용할 수 있습니다.
 
 ---
 
-## ディレクトリ構造
+## 디렉토리 구조
 
-### ユーザーアセットディレクトリ
+### 사용자 에셋 디렉토리
 
 ```
 ~/.harness/video/assets/
-├── README.md                    # 使い方ガイド（自動生成）
+├── README.md                    # 사용 가이드（자동 생성）
 ├── backgrounds/
-│   ├── backgrounds.json         # カスタム背景定義
-│   └── my-custom-bg.png         # カスタム背景画像（オプション）
+│   ├── backgrounds.json         # 커스텀 배경 정의
+│   └── my-custom-bg.png         # 커스텀 배경 이미지（선택）
 ├── sounds/
-│   ├── sounds.json              # カスタム効果音定義
-│   ├── impact.mp3               # 高強調音
-│   ├── pop.mp3                  # 中強調音
-│   ├── transition.mp3           # 場面転換音
-│   └── subtle.mp3               # 低強調音
+│   ├── sounds.json              # 커스텀 효과음 정의
+│   ├── impact.mp3               # 고 강조음
+│   ├── pop.mp3                  # 중 강조음
+│   ├── transition.mp3           # 장면 전환음
+│   └── subtle.mp3               # 저 강조음
 ├── fonts/
 │   ├── MyBrand-Bold.ttf
 │   └── MyBrand-Regular.ttf
@@ -42,15 +42,15 @@
     └── icon.png
 ```
 
-### 初期化
+### 초기화
 
-ユーザーアセットディレクトリを作成:
+사용자 에셋 디렉토리 생성:
 
 ```bash
 node scripts/load-assets.js init
 ```
 
-または手動で作成:
+또는 수동으로 생성:
 
 ```bash
 mkdir -p ~/.harness/video/assets/{backgrounds,sounds,fonts,images}
@@ -58,20 +58,20 @@ mkdir -p ~/.harness/video/assets/{backgrounds,sounds,fonts,images}
 
 ---
 
-## カスタマイズ方法
+## 사용자 정의 방법
 
-### 1. 背景のカスタマイズ
+### 1. 배경 사용자 정의
 
-#### 手順
+#### 절차
 
-1. **デフォルト設定をコピー**:
+1. **기본 설정을 복사**:
 
 ```bash
 cp skills/generate-video/assets/backgrounds/backgrounds.json \
    ~/.harness/video/assets/backgrounds/
 ```
 
-2. **設定を編集**:
+2. **설정을 편집**:
 
 ```json
 {
@@ -105,7 +105,7 @@ cp skills/generate-video/assets/backgrounds/backgrounds.json \
 }
 ```
 
-3. **動画生成で使用**:
+3. **영상 생성에서 사용**:
 
 ```json
 {
@@ -115,16 +115,16 @@ cp skills/generate-video/assets/backgrounds/backgrounds.json \
 }
 ```
 
-#### 背景タイプ
+#### 배경 타입
 
 | Type | Description | Fields |
 |------|-------------|--------|
-| `gradient` | グラデーション背景 | `colors`, `gradient` |
-| `pattern` | パターン背景（グリッド等） | `colors`, `gradient`, `pattern` |
-| `solid` | 単色背景 | `colors.primary` |
-| `image` | 画像背景 | `file` (path to image) |
+| `gradient` | 그라데이션 배경 | `colors`, `gradient` |
+| `pattern` | 패턴 배경（グリッド等）| `colors`, `gradient`, `pattern` |
+| `solid` | 단색 배경 | `colors.primary` |
+| `image` | 이미지 배경 | `file` (path to image) |
 
-#### グラデーションタイプ
+#### 그라데이션 타입
 
 ```json
 // Linear gradient
@@ -143,18 +143,18 @@ cp skills/generate-video/assets/backgrounds/backgrounds.json \
 
 ---
 
-### 2. 効果音のカスタマイズ
+### 2. 효과음 사용자 정의
 
-#### 手順
+#### 절차
 
-1. **デフォルト設定をコピー**:
+1. **기본 설정을 복사**:
 
 ```bash
 cp skills/generate-video/assets/sounds/sounds.json \
    ~/.harness/video/assets/sounds/
 ```
 
-2. **効果音ファイルを配置**:
+2. **효과음 파일을 배치**:
 
 ```bash
 # FreeSoundからダウンロード（CC0ライセンス推奨）
@@ -162,7 +162,7 @@ cp ~/Downloads/my-impact.mp3 ~/.harness/video/assets/sounds/impact.mp3
 cp ~/Downloads/my-pop.mp3 ~/.harness/video/assets/sounds/pop.mp3
 ```
 
-3. **設定を編集**:
+3. **설정을 편집**:
 
 ```json
 {
@@ -189,36 +189,36 @@ cp ~/Downloads/my-pop.mp3 ~/.harness/video/assets/sounds/pop.mp3
 }
 ```
 
-#### 推奨形式
+#### 권장 형식
 
 | Format | Sample Rate | Bit Depth | Notes |
 |--------|-------------|-----------|-------|
-| MP3 | 44100 Hz | 16-bit | 推奨（互換性高） |
-| WAV | 44100 Hz | 16-bit | 高品質（ファイルサイズ大） |
-| OGG | 44100 Hz | - | 軽量（ブラウザ互換性注意） |
+| MP3 | 44100 Hz | 16-bit | 推奨（互換性高）|
+| WAV | 44100 Hz | 16-bit | 高品質（ファイルサイズ大）|
+| OGG | 44100 Hz | - | 軽量（ブラウザ互換性注意）|
 
-#### ボリューム推奨値
+#### 볼륨 권장값
 
 | Context | Volume Range | Notes |
 |---------|--------------|-------|
-| ナレーションあり | 0.15 - 0.4 | 音声を邪魔しない |
-| BGMあり | 0.25 - 0.6 | BGMをダッキング |
-| 音声なし | 0.3 - 1.0 | フル音量OK |
+| 내레이션 있음 | 0.15 - 0.4 | 음성을 방해하지 않음 |
+| BGM 있음 | 0.25 - 0.6 | BGM을 대킹 |
+| 음성 없음 | 0.3 - 1.0 | 풀 볼륨 OK |
 
 ---
 
-### 3. フォントのカスタマイズ
+### 3. 폰트 사용자 정의
 
-#### 手順
+#### 절차
 
-1. **フォントファイルを配置**:
+1. **폰트 파일을 배치**:
 
 ```bash
 cp ~/Downloads/MyFont-Bold.ttf ~/.harness/video/assets/fonts/
 cp ~/Downloads/MyFont-Regular.ttf ~/.harness/video/assets/fonts/
 ```
 
-2. **シーン設定で参照**:
+2. **씬 설정에서 참조**:
 
 ```json
 {
@@ -248,28 +248,28 @@ const fontFamily = loadFont({
 });
 ```
 
-#### 推奨形式
+#### 권장 형식
 
 | Format | Web Safe | Notes |
 |--------|----------|-------|
-| TTF | ✅ Yes | 推奨（最も互換性が高い） |
+| TTF | ✅ Yes | 推奨（最も互換性が高い）|
 | OTF | ✅ Yes | OpenType機能が使える |
-| WOFF/WOFF2 | ✅ Yes | Web最適化（軽量） |
+| WOFF/WOFF2 | ✅ Yes | Web最適化（軽量）|
 
 ---
 
-### 4. 画像のカスタマイズ
+### 4. 이미지의 사용자 정의
 
-#### 手順
+#### 절차
 
-1. **画像ファイルを配置**:
+1. **이미지 파일을 배치**:
 
 ```bash
 cp ~/Downloads/logo.png ~/.harness/video/assets/images/
 cp ~/Downloads/icon.png ~/.harness/video/assets/images/
 ```
 
-2. **シーン設定で参照**:
+2. **씬 설정에서 참조**:
 
 ```json
 {
@@ -283,16 +283,16 @@ cp ~/Downloads/icon.png ~/.harness/video/assets/images/
 }
 ```
 
-#### 推奨形式
+#### 권장 형식
 
 | Format | Use Case | Notes |
 |--------|----------|-------|
-| PNG | ロゴ、アイコン | 透過対応 |
-| JPG | 写真、背景 | 圧縮率高 |
-| SVG | ベクター図形 | 拡大しても綺麗 |
-| WebP | モダン環境 | 軽量高品質 |
+| PNG | 로고, 아이콘 | 투명도対応 |
+| JPG | 사진, 배경 |圧縮率高 |
+| SVG | 벡터 도형 |拡大しても綺麗 |
+| WebP | 모던 환경 | 軽量高品質 |
 
-#### サイズガイドライン
+#### 사이즈 가이드라인
 
 | Asset Type | Recommended Size | Max Size |
 |------------|------------------|----------|
@@ -303,9 +303,9 @@ cp ~/Downloads/icon.png ~/.harness/video/assets/images/
 
 ---
 
-## 優先順位の詳細
+## 우선순위 상세
 
-### 読み込み順序
+###読み込み順序
 
 `scripts/load-assets.js` は以下の順序でアセットを検索:
 
@@ -322,16 +322,16 @@ if (exists(skillPath)) return skillPath;
 return getBuiltInDefault();
 ```
 
-### 部分上書き
+### 부분 오버라이드
 
-一部のアセットだけ上書き可能:
+일부 에셋만 오버라이드 가능:
 
 ```bash
-# 背景だけカスタマイズ（効果音はデフォルト使用）
+# 배경만 사용자 정의（효과음은 기본값 사용）
 cp my-backgrounds.json ~/.harness/video/assets/backgrounds/backgrounds.json
 ```
 
-### JSON内の部分上書き
+### JSON内の 부분 오버라이드
 
 ```json
 // ~/.harness/video/assets/backgrounds/backgrounds.json
@@ -348,13 +348,13 @@ cp my-backgrounds.json ~/.harness/video/assets/backgrounds/backgrounds.json
 }
 ```
 
-**注意**: 同じ `id` がある場合、ユーザー設定が優先されます。
+**注意**: 같은 `id`가 있는 경우、ユーザー設定が優先されます。
 
 ---
 
-## 動作確認
+## 동작 확인
 
-### テストコマンド
+### 테스트 명령
 
 ```bash
 # アセット読み込みテスト
@@ -370,7 +370,7 @@ node scripts/load-assets.js sounds
 node scripts/load-assets.js paths
 ```
 
-### 期待される出力
+###期待される出力
 
 ```
 🧪 Testing asset loader...
@@ -390,13 +390,13 @@ node scripts/load-assets.js paths
 
 ---
 
-## トラブルシューティング
+## 트러블슈팅
 
-### 問題: アセットが読み込まれない
+### 문제: 에셋이読み込まれない
 
-**原因**: ファイルパスが間違っている
+**원인**: 파일 경로가 잘못됨
 
-**解決策**:
+**해결책**:
 ```bash
 # パスを確認
 node scripts/load-assets.js paths
@@ -405,11 +405,11 @@ node scripts/load-assets.js paths
 ls -la ~/.harness/video/assets/backgrounds/
 ```
 
-### 問題: JSON解析エラー
+### 문제: JSON解析エラー
 
-**原因**: JSON形式が不正
+**원인**: JSON 형식이 잘못됨
 
-**解決策**:
+**해결책**:
 ```bash
 # JSONの妥当性チェック
 cat ~/.harness/video/assets/backgrounds/backgrounds.json | jq .
@@ -418,11 +418,11 @@ cat ~/.harness/video/assets/backgrounds/backgrounds.json | jq .
 node scripts/load-assets.js test
 ```
 
-### 問題: 効果音が再生されない
+### 문제: 효과음이 재생되지 않음
 
-**原因**: ファイル形式が非対応
+**원인**: 파일 형식이 지원되지 않음
 
-**解決策**:
+**해결책**:
 ```bash
 # MP3に変換
 ffmpeg -i input.wav -codec:a libmp3lame -b:a 192k output.mp3
@@ -431,11 +431,11 @@ ffmpeg -i input.wav -codec:a libmp3lame -b:a 192k output.mp3
 ffprobe output.mp3
 ```
 
-### 問題: フォントが表示されない
+### 문제: 폰트가 표시되지 않음
 
-**原因**: フォントファイルパスが解決できない
+**원인**: 폰트 파일 경로가 해결되지 않음
 
-**解決策**:
+**해결책**:
 ```typescript
 // 絶対パスを使用
 const fontPath = path.join(os.homedir(), '.harness/video/assets/fonts/MyFont.ttf');
@@ -443,11 +443,11 @@ const fontPath = path.join(os.homedir(), '.harness/video/assets/fonts/MyFont.ttf
 
 ---
 
-## ベストプラクティス
+## 베스트 프랙티스
 
-### 1. バージョン管理
+### 1. 버전 관리
 
-カスタムアセットをGit管理したい場合:
+커스텀 에셋을 Git 관리하고 싶은 경우:
 
 ```bash
 # プロジェクトルートに配置
@@ -462,18 +462,18 @@ project-root/
 ln -s $(pwd)/.video-assets ~/.harness/video/assets
 ```
 
-### 2. チーム共有
+### 2. 팀 공유
 
-チームで共通のアセットを使用:
+팀으로 공통 에셋 사용:
 
 ```bash
 # 共有リポジトリ
 git clone https://github.com/company/video-assets.git ~/.harness/video/assets
 ```
 
-### 3. プロジェクト別アセット
+### 3. 프로젝트별 에셋
 
-プロジェクトごとに異なるアセット:
+프로젝트마다 다른 에셋:
 
 ```bash
 # 環境変数で切り替え
@@ -483,7 +483,7 @@ export VIDEO_ASSETS_DIR=/path/to/project-specific/assets
 const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 ```
 
-### 4. ライセンス管理
+### 4. 라이선스 관리
 
 ```
 ~/.harness/video/assets/
@@ -505,9 +505,9 @@ const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 
 ---
 
-## サンプル集
+## 샘플 모음
 
-### ブランドカラー背景
+### 브랜드 컬러 배경
 
 ```json
 {
@@ -532,7 +532,7 @@ const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 }
 ```
 
-### カスタム効果音セット
+### 커스텀 효과음 세트
 
 ```json
 {
@@ -554,7 +554,7 @@ const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 }
 ```
 
-### 企業ロゴ
+### 기업 로고
 
 ```json
 {
@@ -571,7 +571,7 @@ const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 
 ---
 
-## 参照
+## 참조
 
 - **Asset Loader**: `scripts/load-assets.js`
 - **Default Backgrounds**: `assets/backgrounds/backgrounds.json`
@@ -581,6 +581,6 @@ const assetsDir = process.env.VIDEO_ASSETS_DIR || defaultPath;
 
 ---
 
-## 更新履歴
+## 업데이트 로그
 
-- **2026-02-02**: 初版作成（Phase 7実装）
+- **2026-02-02**: 초판 작성（Phase 7 구현）

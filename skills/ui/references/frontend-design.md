@@ -1,6 +1,7 @@
 ---
 name: frontend-design-summary
 description: "frontend-design の設計思考と美的指針の要約"
+description-ja: "frontend-designの設計思考と美的指針の要約。明示的な要求がある場合のみ適用する。"
 ---
 
 # Frontend Design Summary

@@ -1,6 +1,7 @@
 ---
 name: core-general-principles
 description: "開発の基本原則とセーフティルールを提供する。すべてのタスクで適用される基本的なガイドライン。"
+description-ja: "開発の基本原則と安全ルールを提供する。すべてのタスクに適用される基本的なガイドライン。"
 ---
 
 # General Principles

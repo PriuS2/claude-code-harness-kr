@@ -1,273 +1,273 @@
 # Security Reviewer Profile
 
-`harness-review --security` で起動するセキュリティ専用レビュープロファイル。
-OWASP Top 10 をベースに、認証・認可・秘密情報・依存パッケージの脆弱性を網羅的にチェックする。
+`harness-review --security`로起動하는 보안 전용 리뷰 프로필입니다.
+OWASP Top 10을 기반으로, 인증·인가·기밀 정보·의존 패키지의 취약성을 포괄적으로 체크합니다.
 
-> **Read-only 制約**: このプロファイルで動作する reviewer は
-> Read / Grep / Glob / Bash（読み取り専用コマンドのみ）を使用する。
-> Write / Edit / 書き込み系 Bash は一切実行しない。
+> **Read-only 제약**: 이 프로필로 동작하는 reviewer는
+> Read / Grep / Glob / Bash（읽기 전용 명령만）를 사용합니다.
+> Write / Edit / 쓰기 系 Bash는一切実行하지 않습니다.
 
 ---
 
-## Security Review フロー
+## Security Review 플로우
 
-### Step 1: 対象範囲を特定
+### Step 1: 대상 범위를特定
 
 ```bash
-# 変更ファイルを収集（BASE_REF は呼び出し元から引き継ぐ）
+# 변경 파일을 수집（BASE_REF는 호출원에서引き継ぐ）
 CHANGED_FILES="$(git diff --name-only --diff-filter=ACMR "${BASE_REF:-HEAD~1}")"
 git diff "${BASE_REF:-HEAD~1}" -- ${CHANGED_FILES}
 ```
 
-### Step 2: OWASP Top 10 チェック
+### Step 2: OWASP Top 10 체크
 
-以下の各項目を **変更差分** と **関連ファイル** に対して確認する。
+각 항목을 **변경 차분**과 **관련 파일**에 대해 확인합니다.
 
-#### A01: アクセス制御の不備 (Broken Access Control)
+#### A01: 액세스 제어 불량 (Broken Access Control)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| 認可チェックの抜け | ルート/エンドポイント定義に認証ミドルウェアが適用されているか |
-| 水平越権アクセス | ユーザー所有リソース取得時に `userId` 等でフィルタリングしているか |
-| 垂直越権アクセス | ロールチェック（admin/user/guest 等）が適切に実装されているか |
-| IDOR | URL パラメータやリクエストボディの ID が認可なしに受け入れられていないか |
-| ディレクトリトラバーサル | `../` を含むパス操作がサニタイズされているか |
+| 승인 체크 누락 | 라우트/엔드포인트 정의에 인증 미들웨어가 적용되어 있는지 |
+| 수평越高권 액세스 | 사용자 소유 리소스 취득時に `userId` 등으로 필터링하고 있는지 |
+| 수직越高권 액세스 | 롤 체크（admin/user/guest 등）가 적절히 구현되어 있는지 |
+| IDOR | URL 파라미터나 요청 본문의 ID가 승인 없이受け入れ되고 있는지 |
+| 디렉토리 트래버설 | `../`를含むパス操作がサニタイズされているか |
 
-**検出パターン（Grep で確認）**:
+**검출 패턴（Grep로 확인）**:
 ```bash
-# 認証なしルート候補
+# 인증 없음 라우트 후보
 grep -rn "app\.\(get\|post\|put\|delete\|patch\)" --include="*.ts" --include="*.js"
-# userId なしでのDB取得
+# userId 없이 DB 취득
 grep -rn "findById\|findOne\|select.*where" --include="*.ts"
 ```
 
-#### A02: 暗号化の失敗 (Cryptographic Failures)
+#### A02: 암호화 실패 (Cryptographic Failures)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| 平文での機密情報保存 | パスワード、トークン、PII が平文で DB/ログに保存されていないか |
-| 弱いハッシュアルゴリズム | MD5 / SHA1 をパスワードハッシュに使用していないか |
-| 安全でない乱数 | `Math.random()` を認証トークン生成に使用していないか |
-| TLS 強度 | HTTP（非HTTPS）での機密データ送受信がないか |
-| 鍵のハードコード | 暗号鍵・IV が定数として埋め込まれていないか |
+| 평문での機密情報保存 | 비밀번호, 토큰, PII가 평문으로 DB/로그에 저장되어 있는지 |
+|弱的 해시 알고리즘 | MD5 / SHA1をパスワードハッシュに使用していないか |
+| 안전하지 않은 랜덤 | `Math.random()`을 인증 토큰 생성에 사용하고 있는지 |
+| TLS 강도 | HTTP（非HTTPS）での機密データ送受信がないか |
+| 키のハードコード | 암호키·IV가 상수로埋め겨져 있지 있는지 |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "md5\|sha1\|Math\.random\(\)" --include="*.ts" --include="*.js"
 grep -rn "createHash.*md5\|createHash.*sha1" --include="*.ts"
 grep -rn "http://" --include="*.ts" --include="*.js" --include="*.env*"
 ```
 
-#### A03: インジェクション (Injection)
+#### A03: 인젝션 (Injection)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| SQL インジェクション | ユーザー入力を文字列連結で SQL に組み込んでいないか |
-| NoSQL インジェクション | MongoDB 等で `$where` や入力値を演算子として使用していないか |
-| コマンドインジェクション | `exec()` / `spawn()` にユーザー入力を渡していないか |
-| LDAP インジェクション | LDAP クエリにサニタイズなしの入力を使用していないか |
-| テンプレートインジェクション | テンプレートエンジンにユーザー入力を直接渡していないか |
+| SQL 인젝션 | 사용자 입力を 문자열 결합으로 SQL에組み込んでいる지 |
+| NoSQL 인젝션 | MongoDB 등에서 `$where`나 입력 값을 연산자로 사용하고 있는지 |
+| 커맨드 인젝션 | `exec()` / `spawn()`에 사용자 입력을 전달하고 있는지 |
+| LDAP 인젝션 | LDAP 쿼리에 살균 처리 없는 입력을 사용하고 있는지 |
+| 템플릿 인젝션 | 템플릿 엔진에 사용자 입력을 직접 전달하고 있는지 |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "exec\|execSync\|spawn" --include="*.ts" --include="*.js"
 grep -rn "\`SELECT\|\"SELECT\|'SELECT" --include="*.ts" --include="*.js"
 grep -rn "\$where\|\$\[" --include="*.ts" --include="*.js"
 ```
 
-#### A04: 安全でない設計 (Insecure Design)
+#### A04:不安全한 설계 (Insecure Design)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| レート制限の欠如 | 認証エンドポイントにレート制限が実装されているか |
-| TOCTOU 競合状態 | チェック後・使用前の状態変更を悪用できないか |
-| ビジネスロジックの欠陥 | 状態遷移が不正な順序で実行できないか |
+| 레이트 리밋 부족 | 인증 엔드포인트에 레이트 리밋이 구현되어 있는지 |
+| TOCTOU 경쟁 상태 | 체크 後・使用前の状態変更を悪用できないか |
+| 비즈니스 로직 결함 | 상태 전이가不正한 순서로 실행되지 않는지 |
 
-#### A05: セキュリティの設定ミス (Security Misconfiguration)
+#### A05: 보안 설정 오류 (Security Misconfiguration)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| デフォルト認証情報 | デフォルトパスワード/ユーザー名がそのまま使用されていないか |
-| 詳細なエラーメッセージ | スタックトレースや内部情報が本番でクライアントに返されないか |
-| 不要な機能の有効化 | デバッグエンドポイント・管理画面が本番で有効でないか |
-| HTTP セキュリティヘッダー | HSTS, CSP, X-Frame-Options 等が設定されているか |
-| CORS 設定 | `Access-Control-Allow-Origin: *` が本番で設定されていないか |
+| 기본 인증 정보 | 기본 비밀번호/사용자명이 그대로 사용되지 않고 있는지 |
+| 상세 에러 메시지 | 스택 트레이스나 내부 정보가 本番でクライアントに返されないか |
+| 불필요한 기능의有効化 | 디버그 엔드포인트/관리 화면이 本番で有効でないか |
+| HTTP 보안 헤더 | HSTS, CSP, X-Frame-Options 등이 설정되어 있는지 |
+| CORS 설정 | `Access-Control-Allow-Origin: *`가 本番で設定されていないか |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "cors.*origin.*\*\|allowedOrigins.*\*" --include="*.ts" --include="*.js"
 grep -rn "debug.*true\|NODE_ENV.*development" --include="*.ts"
 grep -rn "console\.log.*password\|console\.log.*token\|console\.log.*secret" --include="*.ts"
 ```
 
-#### A06: 脆弱で古いコンポーネント (Vulnerable and Outdated Components)
+#### A06: 취약하고 오래된 컴포넌트 (Vulnerable and Outdated Components)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| 既知の脆弱性を持つパッケージ | `package.json` の依存関係に CVE が報告されているバージョンがないか |
-| `npm audit` の結果 | high / critical 脆弱性が放置されていないか |
-| ロックファイルとの整合性 | `package-lock.json` / `yarn.lock` が最新か |
+| 알려진 취약성을 가진 패키지 | `package.json`의 의존 관계에 CVE가 보고된 버전이 있는지 |
+| `npm audit` 의 결과 | high / critical 취약성이 방치되어 있지는지 |
+|ロックファイルとの整合性 | `package-lock.json` / `yarn.lock`이 最新か |
 
-**確認コマンド**:
+**확인 명령**:
 ```bash
-# package.json の依存関係を確認（読み取りのみ）
-cat package.json | grep -E '"dependencies"|"devDependencies"' -A 50 | head -60
-# ロックファイルの存在確認
+# package.json의 의존 관계를 확인（読み取りのみ）
+cat package.json | grep -E '"dependencies"|"devDependencies"' -A 50 | head 60
+#ロックファイルの存在確認
 ls -la package-lock.json yarn.lock pnpm-lock.yaml 2>/dev/null
 ```
 
-#### A07: 識別と認証の失敗 (Identification and Authentication Failures)
+#### A07: 식별과 인증의 실패 (Identification and Authentication Failures)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| ブルートフォース対策 | ログイン試行回数の制限・アカウントロックが実装されているか |
-| 弱いパスワードポリシー | 最小文字数・複雑性の要件が設定されているか |
-| セッション固定攻撃 | ログイン後にセッション ID が再生成されているか |
-| セッション有効期限 | 長期間有効なセッション/トークンが適切に失効するか |
-| JWT 検証 | `alg: none` や弱い鍵での署名を受け入れていないか |
+| 브루트포스 방지 | 로그인 시도 횟수 제한·계정 잠금이 구현되어 있는지 |
+|弱的 비밀번호 정책 | 최소 문자 수·복잡성 요건이 설정되어 있는지 |
+| 세션 고정 공격 | 로그인後にセッション ID가 再生成されているか |
+| 세션有効期限 | 장기간 유효한 세션/토큰이 적절히失効するか |
+| JWT 검증 | `alg: none`이나脆弱한鍵での署名を受け入れていないか |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "jwt\.verify\|jwt\.sign" --include="*.ts" --include="*.js"
 grep -rn "expiresIn.*\|expire.*" --include="*.ts"
 grep -rn "algorithm.*none\|alg.*none" --include="*.ts" --include="*.js"
 ```
 
-#### A08: ソフトウェアとデータの整合性の失敗 (Software and Data Integrity Failures)
+#### A08: 소프트웨어와 데이터 무결성의 실패 (Software and Data Integrity Failures)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| 信頼できないソースからのコード実行 | 外部 CDN / URL から動的にスクリプトを読み込んでいないか |
-| デシリアライゼーション | 信頼できないデータを直接 `eval()` / `Function()` に渡していないか |
-| CI/CD パイプラインの保護 | ビルドスクリプトが外部入力を無検証で実行していないか |
+| 신뢰할 수 없는 소스からのコード実行 | 외부 CDN / URLから動的にスクリプトを読み込んでいないか |
+| 역직렬화 | 신뢰할 수 없는 데이터를 직접 `eval()` / `Function()`에 전달하고 있는지 |
+| CI/CD 파이프라인의 보호 | 빌드 스크립트가 외부 입력을 무 검증으로 실행하고 있는지 |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "eval(\|new Function(" --include="*.ts" --include="*.js"
 grep -rn "require(.*\$\|import(.*\$" --include="*.ts" --include="*.js"
 ```
 
-#### A09: セキュリティのログと監視の失敗 (Security Logging and Monitoring Failures)
+#### A09: 보안 로그와 모니터링의 실패 (Security Logging and Monitoring Failures)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| 認証失敗のログ | ログイン失敗・権限エラーが記録されているか |
-| 機密情報のログ出力 | パスワード・トークン・PII がログに含まれていないか |
-| ログインジェクション | ユーザー入力がログに直接書き込まれていないか（CRLF インジェクション） |
+| 인증 실패의 로그 | 로그인 실패·권한 에러가 기록되어 있는지 |
+| 기밀 정보의 로그 출력 | 비밀번호·토큰·PII가 로그에 포함되어 있지는지 |
+| 로그 인젝션 | 사용자 입력이 로그에 직접 쓰여지고 있는지（CRLF 인젝션） |
 
-#### A10: サーバーサイドリクエストフォージェリ (SSRF)
+#### A10: 서버 사이드 요청 위조 (SSRF)
 
-| チェック項目 | 確認方法 |
+| 체크 항목 | 확인 방법 |
 |------------|---------|
-| ユーザー指定 URL へのリクエスト | ユーザー入力の URL に対して内部ネットワークへのアクセスが可能でないか |
-| URL バリデーション | 許可ドメインリストや IP フィルタリングが実装されているか |
-| リダイレクト追従 | リクエストライブラリが内部アドレスへのリダイレクトを追従しないか |
+| 사용자 지정 URLへのリクエスト | 사용자 입력의 URL에 대해 내부 네트워크 액세스가 가능한지 |
+| URL 밸리데이션 | 허용 도메인 목록이나 IP 필터링이 구현되어 있는지 |
+| 리다이렉트 추종 | 요청 라이브러리가 내부 주소로의 리다이렉트를 추종하지 않는지 |
 
-**検出パターン**:
+**검출 패턴**:
 ```bash
 grep -rn "fetch(\|axios\.\|got(\|request(" --include="*.ts" --include="*.js"
 ```
 
 ---
 
-## 認証・認可 レビューポイント
+## 인증·인가 리뷰 포인트
 
-### 認証フロー
-
-```
-1. 入力バリデーション → 型・長さ・形式チェックがあるか
-2. 認証処理 → タイミング攻撃対策（constantTimeCompare 等）があるか
-3. トークン発行 → 十分なエントロピー（crypto.randomBytes 等）があるか
-4. トークン保存 → httpOnly + Secure + SameSite Cookie か、LocalStorage か
-5. トークン検証 → 署名・有効期限・失効チェックが完全か
-6. ログアウト → サーバー側でのトークン無効化が実装されているか
-```
-
-### 認可フロー
+### 인증 플로우
 
 ```
-1. エンドポイントごとに必要なロールが明示されているか
-2. ミドルウェアとルートハンドラの両方でチェックされているか（多層防御）
-3. フロントエンドの非表示だけに依存していないか（バックエンド必須）
-4. リソースオーナーシップの検証が抜けていないか
+1. 입력 검증 → 型・長さ・形式チェックがあるか
+2. 인증 처리 →タイミング攻撃対策（constantTimeCompare等）があるか
+3. 토큰発行 →十分なエントロピー（crypto.randomBytes等）があるか
+4. 토큰保存 → httpOnly + Secure + SameSite Cookieか、LocalStorageか
+5. 토큰検証 →署名・有効期限・失効チェックが完全か
+6. 로그아웃 → 서버側でのトークン無効화가実装されているか
+```
+
+### 인가 플로우
+
+```
+1. 각 엔드포인트에 필요한 역할이 명시되어 있는지
+2. 미들웨어와 라우트 핸들러 양쪽에서 체크되고 있는지（다층 방어）
+3. 프론트엔드의 비표시에만 의존하지 않고 있는지（백엔드 필수）
+4. 리소스 오너십 검증이 누락되지 않고 있는지
 ```
 
 ---
 
-## 秘密情報の取り扱い
+## 기밀 정보의 다루기
 
-### ハードコード検出
+### 하드코드 검출
 
 ```bash
-# API キー・シークレットっぽいパターン
+# API 키·시크릿 비슷한 패턴
 grep -rn "api[_-]key\s*=\s*['\"][^'\"]\|secret\s*=\s*['\"][^'\"]" \
   --include="*.ts" --include="*.js" --include="*.sh"
 
-# AWS / GCP / Azure 認証情報
+# AWS / GCP / Azure 인증 정보
 grep -rn "AKIA\|sk-[a-zA-Z0-9]\{20\}\|AIza" --include="*.ts" --include="*.js"
 
-# JWT 署名鍵のハードコード
+# JWT 서명 키의 하드코드
 grep -rn "jwt.*secret.*=\s*['\"][^'\"]\{8,\}" --include="*.ts" --include="*.js"
 
-# .env ファイルへのコミット
+# .env 파일へのコミット
 git diff "${BASE_REF:-HEAD~1}" -- .env .env.local .env.production
 ```
 
-### 環境変数の適切な利用
+### 환경 변수의 적절한 이용
 
-| 良いパターン | 悪いパターン |
+| 좋은 패턴 | 나쁜 패턴 |
 |------------|------------|
 | `process.env.DATABASE_URL` | `"postgresql://user:pass@localhost/db"` |
 | `process.env.JWT_SECRET` | `const JWT_SECRET = "my-super-secret"` |
 | `process.env.API_KEY` | `const API_KEY = "sk-abc123..."` |
 
-### .env ファイルの管理
+### .env 파일의 관리
 
-- `.env.example` にダミー値が記載されているか
-- `.env` / `.env.local` が `.gitignore` に含まれているか
-- 本番シークレットが `.env.production` にコミットされていないか
+- `.env.example`에 더미 값이 기재되어 있는지
+- `.env` / `.env.local`이 `.gitignore`에 포함되어 있는지
+- 本番 시크릿이 `.env.production`에 커밋되지 않았는지
 
 ```bash
-# .gitignore の確認
+# .gitignore의 확인
 grep -n "\.env" .gitignore 2>/dev/null
-# リポジトリに .env ファイルが含まれていないか
+# 리포지에 .env 파일이 포함되어 있는지
 git diff "${BASE_REF:-HEAD~1}" --name-only | grep "\.env"
 ```
 
 ---
 
-## 依存パッケージの既知脆弱性チェック
+## 의존 패키지의 알려진 취약성 체크
 
-### package.json の確認手順
+### package.json의 확인 절차
 
-1. 変更された `package.json` を読み取る
-2. 新規追加・バージョンアップされたパッケージを特定する
-3. 既知の CVE データベース（NVD, Snyk, GitHub Advisory）との照合を推奨
+1. 변경된 `package.json`을 읽음
+2.新規追加・バージョンアップされたパッケージ을特定
+3. 알려진 CVE 데이터베이스（NVD, Snyk, GitHub Advisory）との照合を推奨
 
 ```bash
-# 変更されたパッケージを確認
+# 변경된 패키지를 확인
 git diff "${BASE_REF:-HEAD~1}" -- package.json package-lock.json
 
-# 現在の依存関係バージョンを確認
+#現在の依存関係バージョンを確認
 cat package.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print(k,v) for d2 in [d.get('dependencies',{}),d.get('devDependencies',{})] for k,v in d2.items()]" 2>/dev/null
 ```
 
-### 高リスクパッケージカテゴリ
+### 고리스크 패키지 카테고리
 
-| カテゴリ | 注意点 |
+| 카테고리 | 주의점 |
 |---------|--------|
-| 認証ライブラリ | passport, jsonwebtoken, bcrypt — バージョンに依存した脆弱性が多い |
-| HTTP クライアント | axios, node-fetch, got — SSRF 対策のデフォルト設定を確認 |
-| テンプレートエンジン | handlebars, ejs, pug — RCE 脆弱性の過去事例あり |
-| XML パーサー | xml2js, fast-xml-parser — XXE 攻撃に注意 |
-| シリアライゼーション | serialize-javascript, node-serialize — RCE リスク |
-| 画像処理 | sharp, imagemagick — バッファオーバーフロー系の脆弱性 |
+| 인증 라이브러리 | passport, jsonwebtoken, bcrypt — 버전에 의존한 취약성이 많음 |
+| HTTP 클라이언트 | axios, node-fetch, got — SSRF 대책의 기본 설정を確認 |
+| 템플릿 엔진 | handlebars, ejs, pug — RCE 취약성의 과거 사례 있음 |
+| XML 파서 | xml2js, fast-xml-parser — XXE 공격에 주의 |
+| 직렬화 | serialize-javascript, node-serialize — RCE 리스크 |
+| 이미지 처리 | sharp, imagemagick — 버퍼 오버플로 계열의 취약성 |
 
 ---
 
-## Security Review 出力形式
+## Security Review 출력 형식
 
-通常の Code Review と同じ JSON スキーマを使用するが、`reviewer_profile: "security"` を設定する。
+일반적인 Code Review와 같은 JSON 스키마를 사용하지만, `reviewer_profile: "security"`를 설정합니다.
 
 ```json
 {
@@ -280,8 +280,8 @@ cat package.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print(k
       "category": "Security",
       "owasp": "A03:2021 - Injection",
       "location": "src/api/users.ts:42",
-      "issue": "ユーザー入力を直接 SQL 文字列に連結している",
-      "suggestion": "プリペアドステートメントまたは ORM を使用する",
+      "issue": "사용자 입력을 직접 SQL 문자열에 결합하고 있습니다",
+      "suggestion": "프리페어드 스테이트먼트 또는 ORM을 사용하세요",
       "cwe": "CWE-89"
     }
   ],
@@ -291,21 +291,21 @@ cat package.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print(k
 }
 ```
 
-### Security 固有フィールド
+### Security 고유 필드
 
-| フィールド | 説明 |
+| 필드 | 설명 |
 |----------|------|
-| `owasp` | 該当する OWASP Top 10 カテゴリ（例: `A01:2021 - Broken Access Control`） |
-| `cwe` | 該当する CWE 番号（例: `CWE-89`） |
-| `cvss_estimate` | CVSS スコアの概算（Critical: 9.0+, High: 7.0-8.9, Medium: 4.0-6.9） |
+| `owasp` | 해당하는 OWASP Top 10 카테고리（예: `A01:2021 - Broken Access Control`） |
+| `cwe` | 해당하는 CWE 번호（예: `CWE-89`） |
+| `cvss_estimate` | CVSS 스코어의概算（Critical: 9.0+, High: 7.0-8.9, Medium: 4.0-6.9） |
 
-### Verdict 判定基準（Security モード）
+### Verdict 판단 기준（Security 모드）
 
-Security モードでは通常より厳格な基準を適用する。
+Security 모드에서는 일반보다 엄격한 기준을 적용합니다.
 
-| 重要度 | 定義 | verdict |
+| 중요도 | 정의 | verdict |
 |--------|------|---------|
-| **critical** | RCE, 認証バイパス, 機密情報の直接露出, SQLi/CMDi | 1 件でも REQUEST_CHANGES |
-| **major** | 不十分な認可チェック, ハードコードされた秘密情報, 脆弱な暗号化 | 1 件でも REQUEST_CHANGES |
-| **minor** | セキュリティヘッダーの欠如, 過剰なエラー情報, 軽微な設定ミス | APPROVE（修正推奨を添える） |
-| **recommendation** | セキュリティベストプラクティスの提案 | APPROVE |
+| **critical** | RCE, 인증 바이패스, 기밀 정보의 직접 노출, SQLi/CMDi | 1건이라도 REQUEST_CHANGES |
+| **major** | 불충분한 승인 체크, 하드코딩된 기밀 정보, 취약한 암호화 | 1건이라도 REQUEST_CHANGES |
+| **minor** | 보안 헤더 누락, 과도한 에러 정보, 경미한 설정 잘못 | APPROVE（修正推奨添え） |
+| **recommendation** | 보안 베스트 프랙티스 제안 | APPROVE |

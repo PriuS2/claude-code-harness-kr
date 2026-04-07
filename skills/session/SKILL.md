@@ -1,6 +1,6 @@
 ---
 name: session
-description: "セッション管理の総合窓口。初期化・記憶・状態を一手に引き受けます。Use when managing Claude Code sessions, /session command. Do NOT load for: app user sessions, login state, authentication features."
+description: "세션 관리의 종합 창구. 초기화·기억·상태를 도맡아 관리합니다. Claude Code 세션 관리, /session 명령을 사용할 때 호출하세요. 앱 사용자 세션, 로그인 상태, 인증 기능에는 사용하지 마세요."
 description-en: "Unified session management window. Handles initialization, memory, state all-in-one. Use when managing Claude Code sessions, /session command. Do NOT load for: app user sessions, login state, authentication features."
 description-ja: "セッション管理の総合窓口。初期化・記憶・状態を一手に引き受けます。Use when managing Claude Code sessions, /session command. Do NOT load for: app user sessions, login state, authentication features."
 allowed-tools: ["Read", "Bash", "Write", "Edit", "Glob"]
@@ -9,7 +9,7 @@ argument-hint: "[list|inbox|broadcast \"message\"]"
 
 # Session Skill (Unified)
 
-Consolidates all session-related functionality into one skill.
+세션 관련 기능을 하나의 스킬로 통합합니다.
 
 ## Usage
 
@@ -69,49 +69,49 @@ Sends a message to all active sessions.
 
 ---
 
-## メモリ最適化（CC 2.1.49+）
+## 메모리 최적화（CC 2.1.49+）
 
-Claude Code 2.1.49 以降、セッション再開時のメモリ使用量が **68% 削減** されました。
+Claude Code 2.1.49以降,セッション再開時のメモリ使用量が **68%削減**되었습니다.
 
-### 長時間セッション管理のベストプラクティス
+### 장시간 세션 관리의 베스트 프랙티스
 
-| ワークロード | 推奨戦略 |
+| 워크로드 | 권장 전략 |
 |------------|---------|
-| **通常実装** | 1-2時間ごとに `--resume` で再開 |
-| **大規模リファクタ** | 機能単位でセッション分割 → 各セッションで `--resume` |
-| **並列タスク** | `/work all` で並列実行、長時間なら途中で `--resume` |
-| **メモリ警告時** | 即座に `--resume` で再開（以前より高速） |
+| **일반 구현** | 1-2시간ごとに `--resume`로再開 |
+| **대규모 리팩터** | 기능 단위로 세션 분할 → 各セッションで `--resume` |
+| **병렬 작업** | `/work all`로 병렬 실행, 장시간이면途中에서 `--resume` |
+| **메모리 경고時** | 即座に `--resume`로再開（이전보다高速） |
 
-### セッション名の自動生成（CC 2.1.41+）
+### 세션명의 자동 생성（CC 2.1.41+）
 
-`/rename` を引数なしで実行すると、会話コンテキストからセッション名を自動生成します。
-長時間セッションや `--resume` を多用するワークフローでセッションの識別が容易になります。
+`/rename`을 인수 없이 실행하면, 대화 컨텍스트からセッション名を自動生成합니다.
+장시간 세션이나 `--resume`을多用するワークフロー에서 세션의 식별이 용이해집니다.
 
-### 効率的なワークフロー例
+### 효율적인 워크플로우 예
 
 ```bash
-# 実装フェーズ1
-claude "認証機能を実装"
-# → 1時間後
+# 구현 단계 1
+claude "인증 기능 구현"
+# → 1시간後
 
-# セッション再開（メモリ効率的）
-claude --resume "パスワードリセット機能を追加"
-# → 1時間後
+# 세션 다시 시작（메모리 효율적）
+claude --resume "비밀번호 재설정 기능 추가"
+# → 1시간後
 
-# さらに再開
-claude --resume "テストを追加"
+# 다시 시작
+claude --resume "테스트 추가"
 ```
 
-### メモリ管理の推奨事項
+### 메모리 관리의 권장 사항
 
-| 推奨事項 | 理由 |
+| 권장 사항 | 이유 |
 |---------|------|
-| **積極的なセッション再開** | 68% メモリ削減で再開コストが低い |
-| **定期的な再開** | コンテキストを整理し、集中力を維持 |
-| **機能単位の分割** | 大規模タスクを小さく分けて再開 |
-| **Plans.md を活用** | 再開時の引き継ぎがスムーズ |
+| **적극적인 세션 다시 시작** | 68% 메모리削減で再開コストが低い |
+| **정기적인 다시 시작** | 컨텍스트를 정리하고 집중력을 유지 |
+| **기능 단위의 분할** | 대규모 작업을 작게 나누어 다시 시작 |
+| **Plans.md 활용** | 다시 시작時の引継ぎがスムーズ |
 
-> 💡 メモリ効率が大幅に改善されたため、セッション再開を積極的に活用してください。
+> 💡  메모리 효율이 크게 개선되었으므로, 세션 다시 시작을 적극 활용하세요.
 
 ---
 

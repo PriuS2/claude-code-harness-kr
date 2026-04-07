@@ -1,21 +1,21 @@
-# Component Type Definitions
+# Component Type Definitions - 컴포넌트 타입 정의
 
-TypeScript type definitions for Remotion components, synchronized with JSON schemas.
+Remotion 컴포넌트용 TypeScript 타입 정의로, JSON 스키마와 동기화됩니다.
 
-## Overview
+## 개요
 
-This directory contains TypeScript type definitions that match the JSON schema definitions in `schemas/`. These types ensure type safety when using Remotion components.
+이 디렉토리는 `schemas/` 의 JSON 스키마 정의와 일치하는 TypeScript 타입 정의를 포함합니다. 이러한 타입은 Remotion 컴포넌트 사용時にタイプ セーフティを確保します。
 
-## Files
+## 파일
 
-- **`components.ts`** - Core type definitions for Remotion components
-- **`index.ts`** - Barrel export for convenience
+- **`components.ts`** - Remotion 컴포넌트의 핵심 타입 정의
+- **`index.ts`** - 편의을 위한 배럴 export
 
-## Type Definitions
+## 타입 정의
 
 ### TransitionConfig
 
-Configuration for the `TransitionWrapper` component.
+`TransitionWrapper` 컴포넌트의 구성.
 
 ```typescript
 interface TransitionConfig {
@@ -44,7 +44,7 @@ const transition: TransitionConfig = {
 
 ### EmphasisConfig
 
-Configuration for the `EmphasisBox` component.
+`EmphasisBox` 컴포넌트의 구성.
 
 ```typescript
 interface EmphasisConfig {
@@ -76,7 +76,7 @@ const emphasis: EmphasisConfig = {
 
 ### BackgroundConfig
 
-Configuration for the `BackgroundLayer` component.
+`BackgroundLayer` 컴포넌트의 구성.
 
 ```typescript
 interface BackgroundConfig {
@@ -107,28 +107,28 @@ const background: BackgroundConfig = {
 
 ## Type Guards
 
-Runtime validation functions to check if objects conform to expected types:
+런타임에 객체가 예상 타입을 준수하는지 확인하는 함수:
 
 ```typescript
-// Check if object is valid TransitionConfig
+// 객체가 유효한 TransitionConfig인지 확인
 if (isTransitionConfig(obj)) {
-  // TypeScript knows obj is TransitionConfig here
+  // TypeScript는 여기서 obj가 TransitionConfig임을 압니다
 }
 
-// Check if object is valid EmphasisConfig
+// 객체가 유효한 EmphasisConfig인지 확인
 if (isEmphasisConfig(obj)) {
-  // TypeScript knows obj is EmphasisConfig here
+  // TypeScript는 여기서 obj가 EmphasisConfig임을 압니다
 }
 
-// Check if object is valid BackgroundConfig
+// 객체가 유효한 BackgroundConfig인지 확인
 if (isBackgroundConfig(obj)) {
-  // TypeScript knows obj is BackgroundConfig here
+  // TypeScript는 여기서 obj가 BackgroundConfig임을 압니다
 }
 ```
 
-## Usage in Remotion Components
+## Remotion 컴포넌트에서의 사용
 
-### Example: Using TransitionConfig
+### Example: TransitionConfig 사용
 
 ```tsx
 import { TransitionConfig } from '../src/types/components';
@@ -153,27 +153,27 @@ export const MyComponent: React.FC<MyComponentProps> = ({ transition }) => {
 };
 ```
 
-## Schema Synchronization
+## 스키마 동기화
 
-These types are manually synchronized with JSON schemas. When schemas change:
+이러한 타입은 JSON 스키마와手動으로 동기화됩니다. 스키마가 변경될 때:
 
-1. Update the corresponding type definition
-2. Update type guards if needed
-3. Run tests to ensure compatibility
+1. 해당 타입 정의를 업데이트합니다
+2. 필요한 경우 타입 가드를 업데이트합니다
+3. 호환성을確保하기 위해 테스트를 실행합니다
 
-### Automated Schema Generation
+### 자동 스키마 생성
 
-For automated type generation from JSON schemas, use:
+JSON 스키마에서 자동 타입 생성을 원하면, 다음을 사용합니다:
 
 ```bash
 npm run generate:schemas
 ```
 
-This generates Zod schemas in `src/schemas/` which can be used for runtime validation.
+이것은 `src/schemas/` 에 런타임 검증에 사용할 수 있는 Zod 스키마를 생성합니다.
 
-## Related Files
+## 관련 파일
 
-- **Schemas**: `schemas/*.schema.json` - JSON Schema definitions
-- **Zod Schemas**: `src/schemas/*.ts` - Auto-generated Zod schemas
-- **Components**: `remotion/components/*.tsx` - Remotion components
-- **Utilities**: `src/utils/converters.ts` - Frame/ms conversion utilities
+- **스키마**: `schemas/*.schema.json` - JSON Schema 정의
+- **Zod 스키마**: `src/schemas/*.ts` - 자동 생성된 Zod 스키마
+- **컴포넌트**: `remotion/components/*.tsx` - 이러한 유틸리티를 사용하는 Remotion 컴포넌트
+- **유틸리티**: `src/utils/converters.ts` - 프레임/ms 변환 유틸리티

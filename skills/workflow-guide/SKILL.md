@@ -1,8 +1,7 @@
 ---
 name: workflow-guide
 description: "Cursor ↔ Claude Code 2-Agentワークフローのガイダンスを提供。Use when user asks about workflow, collaboration, or process. Do NOT load for: implementation work, workflow setup, or executing handoffs."
-description-en: "Provides guidance on Cursor ↔ Claude Code 2-agent workflow. Use when user asks about workflow, collaboration, or process. Do NOT load for: implementation work, workflow setup, or executing handoffs."
-description-ja: "Cursor ↔ Claude Code 2-Agentワークフローのガイダンスを提供。Use when user asks about workflow, collaboration, or process. Do NOT load for: implementation work, workflow setup, or executing handoffs."
+description-ja: "Cursor ↔ Claude Code 2-Agentワークフローのガイダンスを提供。ユーザーがワークフロー、協力プロセスについて質問した場合に使用。実装作業、ワークフロー設定、ハンドオフ実行には読み込まない。"
 allowed-tools: ["Read"]
 user-invocable: false
 ---

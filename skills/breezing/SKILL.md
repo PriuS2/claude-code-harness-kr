@@ -1,7 +1,7 @@
 ---
 name: breezing
-description: "チーム実行モード — harness-work のチーム協調エイリアス。breezing, チーム実行, 全部やって でトリガー。"
-description-ja: "チーム実行モード — harness-work のチーム協調エイリアス。breezing, チーム実行, 全部やって でトリガー。"
+description: "팀 실행 모드 — harness-work의 팀 협업 앨리어스. breezing, 팀 실행, 다 해줘로 트리거."
+description-ja: "팀 실행 모드 — harness-work의 팀 협업 앨리어스. breezing, 팀 실행, 다 해줘로 트리거."
 description-en: "Team execution mode — backward-compatible alias for harness-work with team orchestration."
 allowed-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "Task", "WebSearch"]
 argument-hint: "[all|N-M|--codex|--parallel N|--no-commit|--no-discuss|--auto-mode]"
@@ -10,71 +10,71 @@ user-invocable: true
 
 # Breezing — Team Execution Mode
 
-> **後方互換エイリアス**: `harness-work` をチーム実行モードで動かします。
+> **하위 호환 앨리어스**: `harness-work`를 팀 실행 모드로 동작시킵니다.
 
 ## Quick Reference
 
 ```bash
-breezing                        # スコープを聞いてから実行
-breezing all                    # Plans.md 全タスクを完走
-breezing 3-6                    # タスク3〜6を完走
-breezing --codex all            # Codex CLI で全タスク完走
-breezing --parallel 2 all       # 2並列で全タスク完走
-breezing --no-discuss all       # 計画議論スキップで全タスク完走
-breezing --auto-mode all        # 互換な親セッションで Auto Mode rollout を試す
+breezing                        # 스코프를 물어보고 실행
+breezing all                    # Plans.md 전 작업을 완주
+breezing 3-6                    # 작업 3〜6을 완주
+breezing --codex all            # Codex CLI로 전 작업 완주
+breezing --parallel 2 all       # 2병렬로 전 작업 완주
+breezing --no-discuss all       # 계획 토론 스킵으로 전 작업 완주
+breezing --auto-mode all        # 호환한 부모 세션에서 Auto Mode rollout를 시도
 ```
 
 ## Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `all` | 全未完了タスクを対象 | - |
-| `N` or `N-M` | タスク番号/範囲指定 | - |
-| `--codex` | Codex CLI で実装委託 | false |
-| `--parallel N` | Implementer 並列数 | auto |
-| `--no-commit` | 自動コミット抑制 | false |
-| `--no-discuss` | 計画議論スキップ | false |
-| `--auto-mode` | Auto Mode rollout を明示。親セッションの permission mode が互換な場合のみ採用を検討 | false |
+| `all` | 전 미완료 작업 대상 | - |
+| `N` or `N-M` | 작업 번호/범위 지정 | - |
+| `--codex` | Codex CLI로 구현 의뢰 | false |
+| `--parallel N` | Implementer 병렬 수 | auto |
+| `--no-commit` | 자동 커밋 억제 | false |
+| `--no-discuss` | 계획 토론 스킵 | false |
+| `--auto-mode` | Auto Mode rollout를 명시. 부모 세션의 permission mode가 호환인 경우에만 도입 검토 | false |
 
 ## Execution
 
-**このスキルは `harness-work` に委譲します。** 以下の設定で `harness-work` を実行してください:
+**이 스킬은 `harness-work`에 위임합니다.** 다음 설정으로 `harness-work`를 실행하세요:
 
-1. **引数をそのまま `harness-work` に渡す**
-2. **チーム実行モードを強制** — Lead → Worker spawn → Reviewer spawn の三者分離
-3. **Lead は delegate 専念** — コードを直接書かない
-4. **Auto Mode は opt-in 扱い** — `--auto-mode` は互換な親セッションでの rollout 用フラグとして受け付ける
+1. **인수를 그대로 `harness-work`에 전달**
+2. **팀 실행 모드 강제** — Lead → Worker spawn → Reviewer spawn의 3자 분리
+3. **Lead는 delegate 전념** — 코드를 직접 쓰지 않음
+4. **Auto Mode는 opt-in 취급** — `--auto-mode`는 호환한 부모 세션에서의 rollout용 플래그로 받아들임
 
-### `harness-work` との違い
+### `harness-work`와의 차이
 
-| 特徴 | `harness-work` | `breezing` (このスキル) |
+| 특징 | `harness-work` | `breezing` (이 스킬) |
 |------|-----------------|------------------------|
-| 並列手段 | 必要数に応じた自動分割 | **Lead/Worker/Reviewer の役割分離** |
-| Lead の役割 | 調整+実装 | **delegate (調整専念)** |
-| レビュー | Lead 自己レビュー | **独立 Reviewer** |
-| デフォルトスコープ | 次のタスク | **全部** |
+| 병렬 수단 | 필요 수에 따른 자동 분할 | **Lead/Worker/Reviewer의 역할 분리** |
+| Lead의 역할 | 조정+구현 | **delegate (조정 전념)** |
+| 리뷰 | Lead 자기 리뷰 | **독립 Reviewer** |
+| 기본 스코프 | 다음 작업 | **전부** |
 
 ### Team Composition
 
-| Role | Agent Type | Mode | 責務 |
+| Role | Agent Type | Mode | 책임 |
 |------|-----------|------|------|
-| Lead | (self) | - | 調整・指揮・タスク分配 |
-| Worker ×N | `claude-code-harness:worker` | `bypassPermissions`（現行） / Auto Mode（follow-up）* | 実装 |
-| Reviewer | `claude-code-harness:reviewer` | `bypassPermissions`（現行） / Auto Mode（follow-up）* | 独立レビュー |
+| Lead | (self) | - | 조정·지휘·작업 배분 |
+| Worker ×N | `claude-code-harness:worker` | `bypassPermissions`（현행） / Auto Mode（follow-up）* | 구현 |
+| Reviewer | `claude-code-harness:reviewer` | `bypassPermissions`（현행） / Auto Mode（follow-up）* | 독립 리뷰 |
 
-> *親セッションまたは frontmatter が `bypassPermissions` の場合はそちらが優先される。配布テンプレートは現在も `bypassPermissions` を使うため、Auto Mode は follow-up の rollout 対象であり、既定挙動ではない。
+> *부모 세션 또는 frontmatter가 `bypassPermissions`인 경우그쪽이 우선. 배포 템플릿은 현재도 `bypassPermissions`을 사용하므로, Auto Mode는 follow-up의 rollout 대상이며,기본 동작이 아니다.
 
 ### Codex Mode (`--codex`)
 
-公式プラグイン `codex-plugin-cc` 経由で Codex CLI にすべての実装を委託するモード:
+공식 플러그인 `codex-plugin-cc` 경유로 Codex CLI에 모든 구현을 의뢰하는 모드:
 
 ```bash
-# タスク委託（書き込み可能）
-bash scripts/codex-companion.sh task --write "タスク内容"
+# 작업 의뢰（쓰기 가능）
+bash scripts/codex-companion.sh task --write "작업 내용"
 
-# stdin 経由（大きなプロンプト向け）
+# stdin 경유（큰 프롬프트용）
 CODEX_PROMPT=$(mktemp /tmp/codex-prompt-XXXXXX.md)
-# タスク内容を書き出し
+# 작업 내용을 기록
 cat "$CODEX_PROMPT" | bash scripts/codex-companion.sh task --write
 rm -f "$CODEX_PROMPT"
 ```
@@ -86,99 +86,99 @@ breezing [scope] [--codex] [--parallel N] [--no-discuss] [--auto-mode]
     │
     ↓ Load harness-work with team mode
     │
-Phase 0: Planning Discussion (--no-discuss でスキップ)
-Phase A: Pre-delegate（チーム初期化）
-Phase B: Delegate（Worker 実装 + Reviewer レビュー）
-Phase C: Post-delegate（統合検証 + Plans.md 更新 + commit）
+Phase 0: Planning Discussion (--no-discuss 으로 스킵)
+Phase A: Pre-delegate（팀 초기화）
+Phase B: Delegate（Worker 구현 + Reviewer 리뷰）
+Phase C: Post-delegate（통합 검증 + Plans.md 업데이트 + commit）
 ```
 
-### Progress Feed（Phase B 中の進捗通知）
+### Progress Feed（Phase B 중의 진행 알림）
 
-Lead は Worker のタスク完了ごとに、以下のフォーマットで進捗を出力する:
+Lead는 Worker의 작업 완료 시에 따라, 다음 형식으로 진행을 출력합니다:
 
 ```
-📊 Progress: Task {completed}/{total} 完了 — "{task_subject}"
+📊 Progress: Task {completed}/{total} 완료 — "{작업 주제}"
 ```
 
-**出力例**:
+**출력 예**:
 ```
-📊 Progress: Task 1/5 完了 — "harness-work に失敗再チケット化を追加"
-📊 Progress: Task 2/5 完了 — "harness-sync に --snapshot を追加"
-📊 Progress: Task 3/5 完了 — "breezing にプログレスフィードを追加"
+📊 Progress: Task 1/5 완료 — "harness-work에 실패 재 티켓화 추가"
+📊 Progress: Task 2/5 완료 — "harness-sync에 --snapshot 추가"
+📊 Progress: Task 3/5 완료 — "breezing에 프로그레스 피드 추가"
 ```
 
-> **設計意図**: breezing は長時間実行になることが多い。
-> ユーザーがターミナルをチラ見した時に「今どこまで進んでいるか」が一目で分かるようにする。
-> task-completed.sh フックが systemMessage で同等の情報を出力するため、Lead の出力と補完し合う。
+> **설계 의도**: breezing은 장시간 실행이 되는 경우가 많습니다.
+> 사용자가 터미널을 살짝 볼 때「지금 어디까지 진행되었는지」가 한눈에 보이도록 합니다.
+> task-completed.sh 훅이 systemMessage으로 동등한 정보를 출력하므로, Lead의 출력과 상호 보완.
 
-### Review Policy（全モード統一）
+### Review Policy（전 모드 통일）
 
-Breezing モードでもレビューは **Codex exec 優先 → 内部 Reviewer フォールバック** の統一ポリシーに従う。
-詳細は `harness-work` の「レビューループ」セクションを参照。
+Breezing 모드에서도 리뷰는 **Codex exec 우선 → 내부 Reviewer 폴백**의 통일 정책에 따릅니다.
+상세는 `harness-work`의「리뷰 루프」섹션을 참조합니다.
 
-- Worker が worktree 内で実装・commit → Lead に結果返却
-- Lead が Codex exec でレビュー（120s タイムアウト、フォールバック: Reviewer agent）
-- REQUEST_CHANGES → Lead が SendMessage で Worker に修正指示、Worker が amend（最大 3 回）
-- APPROVE → **Lead** が main に cherry-pick → Plans.md を `cc:完了 [{hash}]` に更新
+- Worker가 worktree 내에서 구현·commit → Lead에게 결과 반환
+- Lead가 Codex exec로 리뷰（120s 타임아웃, 폴백: Reviewer agent）
+- REQUEST_CHANGES → Lead가 SendMessage로 Worker에게수정 지시, Worker가 amend（최대 3회）
+- APPROVE → **Lead**가 main에 cherry-pick → Plans.md를 `cc:완료 [{hash}]`로 업데이트
 
-### 完了報告（Phase C — Lead が生成）
+### 완료 보고（Phase C — Lead가 생성）
 
-全タスク完了後、**Lead** が以下の手順でリッチ完了報告を生成する:
+전 작업 완료 후, **Lead**가 다음 절차로 리치 완료 보고를 생성합니다:
 
-1. `git log --oneline {base_ref}..HEAD` で全 cherry-pick コミットを収集
-2. `git diff --stat {base_ref}..HEAD` で全体の変更規模を取得
-3. Plans.md の `cc:TODO` / `cc:WIP` 残タスクを抽出
-4. `harness-work` の「完了報告フォーマット」の Breezing テンプレートに従い出力
+1. `git log --oneline {base_ref}..HEAD`로 전 cherry-pick 커밋을 수집
+2. `git diff --stat {base_ref}..HEAD`로 전체 변경 규모를 취득
+3. Plans.md의 `cc:TODO` / `cc:WIP` 잔작업을 추출
+4. `harness-work`의「완료 보고 포맷」의 Breezing 템플릿에 따라 출력
 
-> **生成者は Lead**。Worker や hook ではない。Lead が Phase C で git + Plans.md を読んで生成する。
+> **생성자는 Lead**. Worker나 훅이 아닙니다. Lead가 Phase C에서 git + Plans.md를 읽고 생성합니다.
 
-### Phase 0: Planning Discussion（構造化 3 問チェック）
+### Phase 0: Planning Discussion（구조화 3문 체크）
 
-全タスク実行前に、以下の 3 問で計画の健全性を確認する。
-`--no-discuss` 指定時は全スキップ。
+전 작업 실행전에, 다음 3문으로 계획의 건전성을 확인합니다.
+`--no-discuss` 지정시는 전체 스킵.
 
-**Q1. スコープ確認**:
-> 「{{N}} 件のタスクを実行します。スコープは適切ですか？」
+**Q1. 스코프 확인**:
+> "{{N}}건의 작업을 실행합니다. 스코프가 적절합니까?"
 
-多すぎる場合は優先度（Required > Recommended > Optional）で絞り込みを提案。
+너무 많을 경우 우선순위（Required > Recommended > Optional）로 선별 제안.
 
-**Q2. 依存関係確認**（Plans.md に Depends カラムがある場合のみ）:
-> 「タスク {{X}} は {{Y}} に依存しています。実行順序は合っていますか？」
+**Q2. 의존 관계 확인**（Plans.md에 Depends 컬럼이 있는 경우만）:
+> "작업 {{X}}는 {{Y}}에 의존하고 있습니다. 실행 순서가 맞습니까?"
 
-Depends カラムを読み取り、依存チェーンを表示。循環依存があればエラー。
+Depends 컬럼을 읽고, 의존 체인을 표시. 순환 의존이 있으면 에러.
 
-**Q3. リスクフラグ**（`[needs-spike]` タスクがある場合のみ）:
-> 「タスク {{Z}} は [needs-spike] です。先に spike しますか？」
+**Q3. 리스크 플래그**（`[needs-spike]` 작업이 있는 경우만）:
+> "작업 {{Z}}는 [needs-spike]입니다. 먼저 spike합니까?"
 
-spike 未完了の `[needs-spike]` タスクがある場合、spike を先行実行するか確認。
+spike 미완료의 `[needs-spike]` 작업이 있는 경우, spike를 먼저 실행할지 확인.
 
-3 問とも問題なければ、Phase A に進む（合計 30 秒で完了する設計）。
+3문 모두 문제없다면, Phase A로 진행（총 30초로 완료하도록 설계）.
 
-### 依存グラフに基づくタスク割り当て
+### 의존 그래프에 따른 작업 배분
 
-Plans.md に Depends カラムがある場合（v2 フォーマット）、依存グラフに従ってタスクを実行する:
+Plans.md에 Depends 컬럼이 있는 경우（v2 포맷）, 의존 그래프에 따라 작업을 실행합니다:
 
-1. **Depends が `-` のタスク**を先に実行。独立タスクが複数あれば並列 spawn 可能
-2. 各 Worker 完了後、Lead がレビュー→cherry-pick（harness-work Phase B 参照）
-3. 依存元タスクが main に cherry-pick されたら、そのタスクに依存していたタスクを次に実行
-4. 全タスクが完了するまで繰り返す
+1. **Depends가 `-`인 작업**을 먼저 실행. 독립 작업이여러 개 있으면 병렬 spawn 가능
+2. 각 Worker 완료 후, Lead가 리뷰→cherry-pick（harness-work Phase B 참조）
+3. 의존 원작업이 main에 cherry-pick되면, 그 작업에 의존하던 작업을 다음 실행
+4. 모든 작업이 완료될 때까지 반복
 
-> **注意**: 各タスクの「Worker 完了→レビュー→cherry-pick」は逐次処理。
-> 並列化できるのは独立タスク（Depends が `-`）の Worker spawn 部分のみ。
+> **주의**: 각 작업의「Worker 완료→리뷰→cherry-pick」은 순차 처리.
+> 병렬화 할 수 있는 것은 독립 작업（Depends가 `-`）의 Worker spawn 부분만.
 
 ## Codex Native Orchestration
 
-Codex では native subagent を使う。
-代表的な制御面は `spawn_agent`, `wait`, `send_input`, `resume_agent`, `close_agent`。
+Codex에서는 native subagent를 사용합니다.
+대표적인 제어 면은 `spawn_agent`, `wait`, `send_input`, `resume_agent`, `close_agent`.
 
-> **Claude Code vs Codex の通信 API**（SSOT: `team-composition.md` の API マッピング表）:
-> - Claude Code: `SendMessage(to: agentId, message: "...")` で Worker に修正指示
-> - Codex: `resume_agent(agent_id)` で Worker を再開 → `send_input(agent_id, "...")` で指示送信
+> **Claude Code vs Codex의 통신 API**（SSOT: `team-composition.md`의 API 매핑표）:
+> - Claude Code: `SendMessage(to: agentId, message: "...")`로 Worker에게수정 지시
+> - Codex: `resume_agent(agent_id)`로 Worker를 재개 → `send_input(agent_id, "...")`로 지시 전송
 >
-> harness-work の擬似コードは Claude Code 構文で記述。Codex 環境では上記に読み替えること。
+> harness-work의 유사 코드는 Claude Code 구문으로 기술. Codex 환경에서 위의 것으로 대체.
 
 ## Related Skills
 
-- `harness-work` — 単一タスクからチーム実行まで（本体）
-- `harness-sync` — 進捗同期
-- `harness-review` — コードレビュー（breezing 内で自動起動）
+- `harness-work` — 단일 작업에서 팀 실행까지（본체）
+- `harness-sync` — 진행 동기화
+- `harness-review` — 코드 리뷰（breezing 내에서 자동 시작）

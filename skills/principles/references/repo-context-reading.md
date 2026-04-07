@@ -1,6 +1,7 @@
 ---
 name: core-read-repo-context
 description: "リポジトリのコンテキスト（README, Plans.md, 既存コード）を読み取り理解する。セッション開始時、新しいタスク開始前、またはプロジェクト構造の理解が必要な場合に使用します。"
+description-ja: "リポジトリのコンテキスト（README、Plans.md、既存コード）を読み取り理解する。セッション開始時、新しいタスク開始前、またはプロジェクト構造の理解が必要な場合に使用。"
 allowed-tools: ["Read", "Grep", "Glob"]
 ---
 

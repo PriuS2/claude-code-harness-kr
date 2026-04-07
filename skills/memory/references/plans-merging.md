@@ -1,73 +1,73 @@
 ---
 name: merge-plans
-description: "Plans.md のマージ更新を行うスキル（ユーザータスクを保持）。複数のPlans.mdを統合する必要がある場合に使用します。"
+description: "Plans.md의 머지 업데이트를 수행하는 스킬（사용자 작업 유지）.複数のPlans.mdを統合する必要がある場合に使用します."
 allowed-tools: ["Read", "Write", "Edit"]
 ---
 
 # Merge Plans Skill
 
-既存の Plans.md を更新する際に、ユーザーのタスクデータを保持しながら
-テンプレートの構造を適用するスキル。
+기존의 Plans.md를 업데이트할 때, 사용자 작업 데이터를 유지하면서
+템플릿의 구조를 적용하는 스킬입니다.
 
 ---
 
-## 目的
+## 목적
 
-- ユーザーのタスク（🔴🟡🟢📦セクション）を保持
-- テンプレートの構造・マーカー定義を更新
-- 最終更新情報を更新
+- 사용자의 작업（🔴🟡🟢📦섹션）을 유지
+- 템플릿의 구조·마커 정의를 업데이트
+- 최종 업데이트 정보를 업데이트
 
 ---
 
-## Plans.md の構造
+## Plans.md의 구조
 
 ```markdown
-# Plans.md - タスク管理
+# Plans.md - 작업 관리
 
-> **プロジェクト**: {{PROJECT_NAME}}
-> **最終更新**: {{DATE}}
-> **更新者**: Claude Code
-
----
-
-## 🔴 進行中のタスク        ← ユーザーデータ（保持）
-
-## 🟡 未着手のタスク        ← ユーザーデータ（保持）
-
-## 🟢 完了タスク            ← ユーザーデータ（保持）
-
-## 📦 アーカイブ            ← ユーザーデータ（保持）
-
-## マーカー凡例             ← テンプレートから更新
-
-## 最終更新情報             ← 日付を更新
-```
+> **프로젝트**: {{PROJECT_NAME}}
+> **최종 업데이트**: {{DATE}}
+> **업데이트자**: Claude Code
 
 ---
 
-## マージアルゴリズム
+## 🔴 진행 중인 작업        ← 사용자 데이터（유지）
 
-### Step 1: セクション分割
+## 🟡 미착수 작업        ← 사용자 데이터（유지）
 
-```
-既存の Plans.md を以下のセクションに分割:
+## 🟢 완료 작업            ← 사용자 데이터（유지）
 
-1. ヘッダー部分（# Plans.md ... ---）
-2. 🔴 進行中のタスク（次のセクションまで）
-3. 🟡 未着手のタスク（次のセクションまで）
-4. 🟢 完了タスク（次のセクションまで）
-5. 📦 アーカイブ（次のセクションまで）
-6. マーカー凡例（次のセクションまで）
-7. 最終更新情報（ファイル末尾まで）
+## 📦 아카이브            ← 사용자 데이터（유지）
+
+## 마커 凡例             ← 템플릿에서 업데이트
+
+## 최종 업데이트 정보             ← 날짜를 업데이트
 ```
 
-### Step 2: タスクセクションの抽出
+---
+
+## 머지 알고리즘
+
+### Step 1: 섹션 분할
+
+```
+기존 Plans.md를 다음 섹션으로 분할:
+
+1. 헤더 부분（# Plans.md ... ---）
+2. 🔴 진행 중인 작업（다음 섹션까지）
+3. 🟡 미착수 작업（다음 섹션까지）
+4. 🟢 완료 작업（다음 섹션까지）
+5. 📦 아카이브（다음 섹션까지）
+6. 마커 凡例（다음 섹션까지）
+7. 최종 업데이트 정보（파일 끝까지）
+```
+
+### Step 2: 작업 섹션의 추출
 
 ```bash
 extract_section() {
   local file="$1"
   local start_marker="$2"
-  local end_markers="$3"  # パイプ区切りの終了マーカー
+  local end_markers="$3"  # 파이프 区切りの終了マーカー
 
   awk -v start="$start_marker" -v ends="$end_markers" '
     BEGIN { in_section = 0; split(ends, end_arr, "|") }
@@ -81,14 +81,14 @@ extract_section() {
   ' "$file"
 }
 
-# 各セクションを抽出
-TASKS_WIP=$(extract_section "$PLANS_FILE" "## 🔴" "## 🟡|## 🟢|## 📦|## マーカー|---")
-TASKS_TODO=$(extract_section "$PLANS_FILE" "## 🟡" "## 🔴|## 🟢|## 📦|## マーカー|---")
-TASKS_DONE=$(extract_section "$PLANS_FILE" "## 🟢" "## 🔴|## 🟡|## 📦|## マーカー|---")
-TASKS_ARCHIVE=$(extract_section "$PLANS_FILE" "## 📦" "## 🔴|## 🟡|## 🟢|## マーカー|---")
+# 각 섹션을 추출
+TASKS_WIP=$(extract_section "$PLANS_FILE" "## 🔴" "## 🟡|## 🟢|## 📦|## 마커|---")
+TASKS_TODO=$(extract_section "$PLANS_FILE" "## 🟡" "## 🔴|## 🟢|## 📦|## 마커|---")
+TASKS_DONE=$(extract_section "$PLANS_FILE" "## 🟢" "## 🔴|## 🟡|## 📦|## 마커|---")
+TASKS_ARCHIVE=$(extract_section "$PLANS_FILE" "## 📦" "## 🔴|## 🟡|## 🟢|## 마커|---")
 ```
 
-### Step 3: タスクの検証
+### Step 3: 작업의 검증
 
 ```bash
 # 空でないことを確認
@@ -101,135 +101,135 @@ TODO_COUNT=$(count_tasks "$TASKS_TODO")
 DONE_COUNT=$(count_tasks "$TASKS_DONE")
 ARCHIVE_COUNT=$(count_tasks "$TASKS_ARCHIVE")
 
-echo "保持されるタスク:"
-echo "  進行中: $WIP_COUNT"
-echo "  未着手: $TODO_COUNT"
-echo "  完了: $DONE_COUNT"
-echo "  アーカイブ: $ARCHIVE_COUNT"
+echo "유지되는 작업:"
+echo "  진행중: $WIP_COUNT"
+echo "  미착수: $TODO_COUNT"
+echo "  완료: $DONE_COUNT"
+echo "  아카이브: $ARCHIVE_COUNT"
 ```
 
-### Step 4: 新しい Plans.md の生成
+### Step 4: 새 Plans.md의 생성
 
 ```markdown
-# Plans.md - タスク管理
+# Plans.md - 작업 관리
 
-> **プロジェクト**: {{PROJECT_NAME}}
-> **最終更新**: {{DATE}}
-> **更新者**: Claude Code
+> **프로젝트**: {{PROJECT_NAME}}
+> **최종 업데이트**: {{DATE}}
+> **업데이트자**: Claude Code
 
 ---
 
-## 🔴 進行中のタスク
+## 🔴 진행 중인 작업
 
-<!-- cc:WIP のタスクをここに記載 -->
+<!-- cc:WIP의 작업을 여기에 기재 -->
 
 {{TASKS_WIP}}
 
 ---
 
-## 🟡 未着手のタスク
+## 🟡 미착수 작업
 
-<!-- cc:TODO, pm:依頼中（互換: cursor:依頼中） のタスクをここに記載 -->
+<!-- cc:TODO, pm:依頼中（호환: cursor:依頼中） 의 작업을 여기에 기재 -->
 
 {{TASKS_TODO}}
 
 ---
 
-## 🟢 完了タスク
+## 🟢 완료 작업
 
-<!-- cc:完了, pm:確認済（互換: cursor:確認済） のタスクをここに記載 -->
+<!-- cc:완료, pm:확인済（호환: cursor:확인済） 의 작업을 여기에 기재 -->
 
 {{TASKS_DONE}}
 
 ---
 
-## 📦 アーカイブ
+## 📦 아카이브
 
-<!-- 古い完了タスクはここに移動 -->
+<!--古い完了 작업はここに移動 -->
 
 {{TASKS_ARCHIVE}}
 
 ---
 
-## マーカー凡例
+## 마커 凡例
 
-| マーカー | 意味 |
-|---------|------|
-| `pm:依頼中` | PM から依頼されたタスク（互換: cursor:依頼中） |
-| `cc:TODO` | Claude Code 未着手 |
-| `cc:WIP` | Claude Code 作業中 |
-| `cc:完了` | Claude Code 完了（確認待ち） |
-| `pm:確認済` | PM 確認完了（互換: cursor:確認済） |
-| `cursor:依頼中` | （互換）pm:依頼中 と同義 |
-| `cursor:確認済` | （互換）pm:確認済 と同義 |
-| `blocked` | ブロック中（理由を併記） |
+| 마커 | 의미 |
+|---------|-------|
+| `pm:依頼中` | PM으로부터 의뢰된 작업（호환: cursor:依頼中） |
+| `cc:TODO` | Claude Code 미착수 |
+| `cc:WIP` | Claude Code 작업중 |
+| `cc:완료` | Claude Code 완료（확인 대기） |
+| `pm:확인済` | PM 확인 완료（호환: cursor:확인済） |
+| `cursor:依頼中` | （호환）pm:依頼中와 同義 |
+| `cursor:確認済` | （호환）pm:확인済와 同義 |
+| `blocked` | 블록중（사유를 並記） |
 
 ---
 
-## 最終更新情報
+## 최종 업데이트 정보
 
 - **更新日時**: {{DATE}}
 - **最終セッション担当**: Claude Code
-- **ブランチ**: main
-- **更新種別**: プラグインアップデート
+- **브랜치**: main
+- **更新種別**: 플러그인 업데이트
 ```
 
 ---
 
-## 空セクションの処理
+## 빈 섹션의 처리
 
-タスクが空の場合は、デフォルトテキストを挿入:
+작업이 빈 경우, 기본 텍스트를 삽입합니다:
 
 ```markdown
-## 🔴 進行中のタスク
+## 🔴 진행 중인 작업
 
-<!-- cc:WIP のタスクをここに記載 -->
+<!-- cc:WIP의 작업을 여기에 기재 -->
 
-（現在なし）
+（현재 없음）
 ```
 
 ---
 
-## エラー処理
+## 에러 처리
 
-### Plans.md が解析できない場合
+### Plans.md가 파싱 불가능한 경우
 
 ```bash
 if ! validate_plans_structure "$PLANS_FILE"; then
-  echo "⚠️ Plans.md の構造を解析できませんでした"
-  echo "バックアップを保持し、新規テンプレートを使用します"
+  echo "⚠️ Plans.md의 구조를 파싱할 수 없었습니다"
+  echo "백업을 유지하고, 새 템플릿을 사용합니다"
 
-  # バックアップ
+  # 백업
   cp "$PLANS_FILE" "${PLANS_FILE}.bak.$(date +%Y%m%d%H%M%S)"
 
-  # テンプレートを使用
+  # 템플릿 사용
   use_template_instead=true
 fi
 ```
 
-### 必須セクションがない場合
+### 필수 섹션이 없는 경우
 
-不足しているセクションはテンプレートのデフォルトで補完。
+부족한 섹션은 템플릿의 기본값으로 보충합니다.
 
 ---
 
-## 出力
+## 출력
 
-| 項目 | 説明 |
+| 항목 | 설명 |
 |------|------|
-| `merge_successful` | マージ成功フラグ |
-| `tasks_wip_count` | 進行中タスク数 |
-| `tasks_todo_count` | 未着手タスク数 |
-| `tasks_done_count` | 完了タスク数 |
-| `tasks_archive_count` | アーカイブタスク数 |
-| `backup_created` | バックアップ作成有無 |
+| `merge_successful` | 머지 성공 플래그 |
+| `tasks_wip_count` | 진행중 작업 수 |
+| `tasks_todo_count` | 미착수 작업 수 |
+| `tasks_done_count` | 완료 작업 수 |
+| `tasks_archive_count` | 아카이브 작업 수 |
+| `backup_created` | 백업 생성 유무 |
 
 ---
 
-## 使用例
+## 사용 예
 
 ```bash
-# スキルの呼び出し
+# 스킬의 호출
 merge_plans \
   --existing "./Plans.md" \
   --template "$PLUGIN_PATH/templates/Plans.md.template" \
@@ -240,7 +240,7 @@ merge_plans \
 
 ---
 
-## 関連スキル
+## 관련 스킬
 
-- `update-2agent-files` - 更新フロー全体
-- `generate-workflow-files` - 新規生成
+- `update-2agent-files` - 업데이트 플로우 전체
+- `generate-workflow-files` - 신규 생성

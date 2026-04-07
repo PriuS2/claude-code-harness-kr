@@ -1,16 +1,16 @@
 # Sync SSOT from Memory Reference
 
-Promote important observations recorded in memory systems (Harness Memory or Serena) to the project's SSOT:
-`.claude/memory/decisions.md` and `.claude/memory/patterns.md`.
+메모리 시스템（Harness Memory 또는 Serena）에 기록된 중요한 관찰을 프로젝트의 SSOT:
+`.claude/memory/decisions.md`와 `.claude/memory/patterns.md`로 승격시킵니다.
 
 ---
 
 ## VibeCoder Phrases
 
-- "**Save what we learned for next time**" → this command
-- "**Promote important decisions to SSOT**" → this command
-- "**Organize decisions (why) and methods (how) separately**" → Reflect in decisions/patterns separately
-- "**I don't know what to keep**" → Filter by importance and propose only candidates
+- "**Save what we learned for next time**" → 이 명령
+- "**Promote important decisions to SSOT**" → 이 명령
+- "**Organize decisions (why) and methods (how) separately**" → decisions/patterns에 각각 반영
+- "**I don't know what to keep**" → 중요도로 필터링하여 후보만 제안
 
 ---
 
