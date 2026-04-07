@@ -1,29 +1,30 @@
 {
   "name": "claude-code-harness-marketplace",
   "metadata": {
-    "description": "claude-code-harness の配布/導入を支援する（単一プラグイン）マーケットプレース"
+    "description": "Claude Code Harness KR - 한국어 번역版"
   },
   "owner": {
-    "name": "Chachamaru"
+    "name": "PriuS2"
   },
   "plugins": [
     {
-      "name": "claude-code-harness",
+      "name": "claude-code-harness-kr",
       "source": "./",
-      "description": "A harness for solo developers (Vibecoders) to handle full-cycle contract development.",
+      "description": "Claude harness KR - 한국어 번역版 for solo developers",
       "author": {
-        "name": "Chachamaru",
-        "url": "https://github.com/Chachamaru127"
+        "name": "PriuS2",
+        "url": "https://github.com/PriuS2"
       },
-      "homepage": "https://github.com/Chachamaru127/claude-code-harness",
-      "repository": "https://github.com/Chachamaru127/claude-code-harness",
+      "homepage": "https://github.com/PriuS2/claude-code-harness-kr",
+      "repository": "https://github.com/PriuS2/claude-code-harness-kr",
       "license": "MIT",
       "keywords": [
         "claude-code",
         "plugin",
         "vibecoder",
         "workflow",
-        "plan-work-review"
+        "plan-work-review",
+        "korean"
       ],
       "category": "productivity",
       "strict": true
