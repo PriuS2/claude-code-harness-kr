@@ -1,7 +1,7 @@
 {
-  "name": "claude-code-harness",
-  "version": "3.17.1",
-  "description": "Claude harness - A harness for solo developers (Vibecoders) to handle full-cycle contract development.",
+  "name": "claude-code-harness-kr",
+  "version": "3.17.2",
+  "description": "Claude harness KR - 한국어 번역版 harness for solo developers",
   "author": {
     "name": "Chachamaru",
     "url": "https://github.com/Chachamaru127"
